@@ -10,7 +10,7 @@ Die TryLater-Serveranwendung verwaltet die Nutzerdaten und Empfehlungen der TryL
 ---
 
 ## 🧰 Voraussetzungen
-- JDK 21 (Java Development Kit)**
+- **JDK 21 (Java Development Kit)**
 - Maven wird über den mitgelieferten Maven Wrapper (`./mvnw`) verwendet – keine separate Installation nötig.
 - Eine zusätzliche Datenbank ist nicht erforderlich – es wird die integrierte **H2-Datenbank** verwendet.
 
