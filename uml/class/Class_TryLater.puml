@@ -2,12 +2,6 @@
 skinparam classAttributeIconSize 0
 hide empty members
 
-enum UserRegisterStatus {
-    UNCONFIRMED,
-    CONFIRMED,
-    BLOCKED
-}
-
 class User {
     - id : Long
     - userName : String
@@ -15,7 +9,6 @@ class User {
     - email : String
     - password : String
     - imgId: Long
-    - registerStatus : UserRegisterStatus
     + constructor()
     + getter()
     + setter()
@@ -62,7 +55,7 @@ class JwtAuthFilter {
     # doFilterInternal()
 }
 
-note top of JwtAuthFilter
+note left of JwtAuthFilter
     Der JwtAuthFilter regelt den Zugriff auf gesicherte Routen.
     Kein/Ungültiger Token lehnt die Anfrage ab.
     Gültiger Token macht User im Controller verfügbar.
@@ -79,7 +72,6 @@ class AuthController {
     + POST /api/auth/logout() <<secured>>
 }
 
-User ..> UserRegisterStatus : <<use>>
 UserRepository --> User
 UserService --> UserRepository
 UserController --> AuthService
@@ -128,51 +120,14 @@ class ContactController {
     + GET /api/contact() <<secured>>
     + GET /api/contact/[id}() <<secured>>
     + POST /api/contact() <<secured>>
-    + PATCH /ape/contact/{id}() <<secured>>
+    + PATCH /api/contact/{id}() <<secured>>
     + DELETE /api/contact/[id}() <<secured>>
 }
 
-Contact "2..2" *-- "0..*" User
+Contact "0..*" --* "1" User
 Contact ..> ContactStatus : <<use>>
 ContactRepository --> Contact
 ContactService --> ContactRepository
 ContactController --> ContactService
-
-class Group {
-    id : Long
-    groupName : String
-    groupOwner : User
-    groupMember : User[]
-    imgId : Long
-}
-
-class GroupRepository {
-    group : Group[]
-    + findGroupById(groupId : Long) : Group
-    + save(group : Group)
-    + update(group : Group)
-    + delete(group : Group)
-}
-
-class GroupService {
-    - groupRepository : GroupRepository
-    + getContactsByStatus(user : User, contactStatus : ContactStatus)
-    + getContactById(contactId : Long)
-    + createGroup(user : User)
-    + deleteGroup(groupId : Long)
-}
-
-class GroupController {
-    + GET /api/group() <<secured>>
-    + GET /api/group/[id}() <<secured>>
-    + POST /api/group() <<secured>>
-    + PATCH /ape/group/{id}() <<secured>>
-    + DELETE /api/group/{id}() <<secured>>
-}
-
-Group "0..*" *-- "0..*" User
-GroupRepository --> Group
-GroupService --> GroupRepository
-GroupController --> GroupService
 
 @enduml

@@ -1,0 +1,67 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+
+enum GroupMemberStatus {
+    INVITED,
+    JOINED,
+    BLOCKED
+}
+
+class GroupMember {
+    - id : Long
+    - user : User
+    - group : Group
+    - status : GroupMemberStatus
+    + constructor()
+    + getter()
+    + setter()
+}
+
+class Group {
+    - id : Long
+    - groupName : String
+    - groupOwner : User
+    - groupMember : GroupMember[]
+    - imgId : Long
+    + constructor()
+    + getter()
+    + setter()
+}
+
+class GroupRepository {
+    group[] : Group
+    + findGroupById(groupId : Long) : Group
+    + save(group : Group)
+    + update(group : Group)
+    + delete(group : Group)
+}
+
+class GroupService {
+    - groupRepository : GroupRepository
+    + getContactsByStatus(user : User, contactStatus : ContactStatus)
+    + getContactById(contactId : Long)
+    + createGroup(user : User)
+    + deleteGroup(groupId : Long)
+}
+
+class GroupController {
+    - groupService : GroupService
+    + GET /api/group/accepted() <<secured>>
+    + GET /api/group/invites() <<secured>>
+    + POST /api/group() <<secured>>
+    + PUT /api/group{id}() <<secured>>
+    + PUT /api/group/accept/{id}() <<secured>>
+    + DELETE /api/group/{id}() <<secured>>
+    + DELETE /api/group/membership/{id}() <<secured>>
+}
+
+GroupMember ..> GroupMemberStatus
+GroupMember "0..*" --o "1" Group
+
+Group "0..*" --o "1" User
+GroupRepository --> Group
+GroupService --> GroupRepository
+GroupController --> GroupService
+
+@enduml

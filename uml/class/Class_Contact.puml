@@ -1,0 +1,53 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+
+enum ContactStatus {
+    PENDING
+    ACCEPTED
+    BLOCKED
+}
+
+class Contact {
+    - id : Long
+    - status : ContactStatus
+    - requester : User
+    - receiver : User
+    + constructor()
+    + getter()
+    + setter()
+}
+
+class ContactRepository {
+    - contact[] : Contact
+    + findAllByRequesterOrReceiverAndContactStatus(user : User) : Contact[]
+    + findContactById(contactId : Long) : Contact
+    + save(contact : Contact)
+    + update(contact : Contact)
+    + delete(contact : Contact)
+}
+
+class ContactService {
+    - contactRepository : ContactRepository
+    + getContactsByStatus(user : User, contactStatus : ContactStatus)
+    + getContactById(contactId : Long)
+    + createContact(user : User, receiverId : Long)
+    + updateContactStatus(user : User, contactStatus : ContactStatus)
+    + deleteContact(contactId : Long)
+}
+
+class ContactController {
+    + GET /api/contact() <<secured>>
+    + GET /api/contact/[id}() <<secured>>
+    + POST /api/contact() <<secured>>
+    + PATCH /ape/contact/{id}() <<secured>>
+    + DELETE /api/contact/[id}() <<secured>>
+}
+
+Contact "2..2" *-- "0..*" User
+Contact ..> ContactStatus : <<use>>
+ContactRepository --> Contact
+ContactService --> ContactRepository
+ContactController --> ContactService
+
+@enduml

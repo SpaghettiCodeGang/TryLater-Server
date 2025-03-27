@@ -1,0 +1,85 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+
+class User {
+    - id : Long
+    - userName : String
+    - displayName : String
+    - email : String
+    - password : String
+    - imgId: Long
+    + constructor()
+    + getter()
+    + setter()
+}
+
+class UserRepository {
+    - user[] : User
+    + findByEmailOrUserName(email: String, userName: String) : User
+    + existsByEmail(email : String) : boolean
+    + existsByUserName(userName : String) : boolean
+    + save(user : User)
+    + update(user : User)
+    + delete(user : User)
+}
+
+class UserService {
+    - userRepository : UserRepository
+    + registerUser(user : User)
+    + updateUser(user : User
+    + deleteUser(user : User)
+    + findByEmailOrUserName(input : String) : User
+}
+
+class UserController {
+    - userService : UserService
+    - authService : AuthService
+    + GET /api/user/me() <<secured>>
+    + GET /api/user/{id}() <<secured>>
+    + GET /api/user/search() <<secured>>
+    + POST /api/user/me()
+    + PUT /api/user/me() <<secured>>
+    + DELETE /api/user/me() <<secured>>
+}
+
+class JwtService {
+    + generateToken(userName : String) : Token
+    + extractUserName(token : Token) : String
+}
+
+class JwtAuthFilter {
+    - jwtService : JwtService
+    - authService : AuthService
+    - userService : UserService
+    # doFilterInternal()
+}
+
+note top of JwtAuthFilter
+    Der JwtAuthFilter regelt den Zugriff auf gesicherte Routen.
+    Kein/Ungültiger Token lehnt die Anfrage ab.
+    Gültiger Token macht User im Controller verfügbar.
+end note
+
+class AuthService {
+    - jwtService : JwtService
+    + login() : User
+    + logout() : void
+}
+
+class AuthController {
+    + POST /api/auth/login()
+    + POST /api/auth/logout() <<secured>>
+}
+
+UserRepository --> User
+UserService --> UserRepository
+UserController --> AuthService
+UserController --> UserService
+AuthService --> JwtService
+AuthController --> AuthService
+JwtAuthFilter --> UserService
+JwtAuthFilter --> JwtService
+JwtAuthFilter --> AuthService
+
+@enduml
