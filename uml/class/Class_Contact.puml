@@ -40,11 +40,11 @@ class ContactController {
     + GET /api/contact() <<secured>>
     + GET /api/contact/[id}() <<secured>>
     + POST /api/contact() <<secured>>
-    + PATCH /ape/contact/{id}() <<secured>>
+    + PUT /api/contact/{id}() <<secured>>
     + DELETE /api/contact/[id}() <<secured>>
 }
 
-Contact "2..2" *-- "0..*" User
+Contact "0..*" --* "1" User
 Contact ..> ContactStatus : <<use>>
 ContactRepository --> Contact
 ContactService --> ContactRepository

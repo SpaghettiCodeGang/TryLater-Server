@@ -56,9 +56,12 @@ class JwtAuthFilter {
 }
 
 note left of JwtAuthFilter
-    Der JwtAuthFilter regelt den Zugriff auf gesicherte Routen.
-    Kein/Ungültiger Token lehnt die Anfrage ab.
-    Gültiger Token macht User im Controller verfügbar.
+    Der JwtAuthFilter kontrolliert den
+    Zugriff auf geschützte Endpunkte.
+    Fehlt ein Token oder ist dieser
+    ungültig, wird die Anfrage abgelehnt.
+    Ein gültiger Token macht den User
+    im Controller verfügbar.
 end note
 
 class AuthService {
@@ -120,7 +123,7 @@ class ContactController {
     + GET /api/contact() <<secured>>
     + GET /api/contact/[id}() <<secured>>
     + POST /api/contact() <<secured>>
-    + PATCH /api/contact/{id}() <<secured>>
+    + PUT /api/contact/{id}() <<secured>>
     + DELETE /api/contact/[id}() <<secured>>
 }
 

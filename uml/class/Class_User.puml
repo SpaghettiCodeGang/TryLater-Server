@@ -55,10 +55,13 @@ class JwtAuthFilter {
     # doFilterInternal()
 }
 
-note top of JwtAuthFilter
-    Der JwtAuthFilter regelt den Zugriff auf gesicherte Routen.
-    Kein/Ungültiger Token lehnt die Anfrage ab.
-    Gültiger Token macht User im Controller verfügbar.
+note left of JwtAuthFilter
+    Der JwtAuthFilter kontrolliert den
+    Zugriff auf geschützte Endpunkte.
+    Fehlt ein Token oder ist dieser
+    ungültig, wird die Anfrage abgelehnt.
+    Ein gültiger Token macht den User
+    im Controller verfügbar.
 end note
 
 class AuthService {
