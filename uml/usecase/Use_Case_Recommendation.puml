@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+package "Empfehlung geben"{
+"Empfehlung\nerstellen" as (create)
+"Empfehlung\nsenden" as (send)
+}
+package "Empfehlung erhalten"{
+(Empfehlung\nerhalten) as (receive)
+(Empfehlung\nspeichern) as (safe)
+(Empfehlung\nablehnen) as (decline)
+}
+(Empfehlung\nansehen) as (lookup)
+
+User --> (create)
+(create) <. (send) :extend
+User -> (send)
+
+User -> (receive)
+(send) <.. (receive) :extend
+User -> (safe)
+DB_System --> (safe)
+(receive) ..> (safe)
+User --> (decline)
+(receive) ..> (decline)
+
+User -> (lookup)
+DB_System -> (lookup)
+(safe) <. (lookup) :extend
+
+@enduml

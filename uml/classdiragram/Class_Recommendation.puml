@@ -1,0 +1,65 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide empty members
+
+class Recommendation {
+-id : Long
+-title : String
+-category : Category
+-description : String
+-imageId : Long
+-urlField : String
++construct()
++getter()
++setter()
+}
+
+class RecommendationController{
+}
+
+class RecommendationService{
+}
+
+RecommendationController --> RecommendationService
+RecommendationRepository --> Recommendation
+
+
+class RecommendationRepository {
+-recommendation[] : Recommendation
+}
+
+RecommendationService --> RecommendationRepository
+Recommendation *-- Category
+
+
+abstract Category {
+-tags : Set<Tag>
+}
+
+abstract Tag {
+}
+
+from left to right
+Tag <-- Category
+
+class Location {
+}
+
+class Recipes {
+}
+
+class Products {
+}
+
+class Media {
+}
+
+
+Category <|--- Location
+Category <|--- Recipes
+Category <|--- Products
+Category <|--- Media
+
+
+
+@enduml
