@@ -65,6 +65,7 @@ class Recommendation {
     - imgId : String
     - creator : User
     - url : URI
+    - rating : Int
     - creationDate : LocalDateTime
     - category : Category
     - tags : List<Tag>
