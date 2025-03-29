@@ -1,0 +1,131 @@
+@startuml
+allowmixing
+skinparam classAttributeIconSize 0
+hide empty members
+
+class User {
+    - id : Long
+    - userName : String
+    - displayName : String
+    - email : String
+    - password : String
+    - imgId: Long
+    - registrationDate : LocalDateTime
+    + constructor()
+    + getter()
+    + setter()
+}
+
+enum ContactStatus {
+    PENDING
+    ACCEPTED
+    BLOCKED
+}
+
+class Contact {
+    - id : Long
+    - requester : User
+    - receiver : User
+    - requestDate : LocalDateTime
+    - acceptDate : LocalDateTime
+    - status : ContactStatus
+    + constructor()
+    + getter()
+    + setter()
+    + changeStatus(status : ContactStatus)
+    + getContactPartner(me : User) : User
+}
+
+class RecommendationAssignment {
+    - id : Long
+    - receiver : User
+    - recommendation : Recommendation
+    - status : StatusEnum
+    - receivedAt : LocalDateTime
+    - acceptedAt : LocalDateTime
+    + constructor()
+    + getter()
+    + setter()
+    + changeStatus(status : RecommendationStatus)
+}
+
+note left of RecommendationAssignment
+  Join-Entity: Many-to-Many mit Metadaten
+end note
+
+enum RecommendationStatus {
+    SENT,
+    ACCEPTED
+}
+
+class Recommendation {
+    - id : Long
+    - name : String
+    - description : String
+    - imgId : String
+    - creator : User
+    - url : URI
+    - creationDate : LocalDateTime
+    - category : Category
+    - tags : List<Tag>
+    + constructor()
+    + getter()
+    + setter()
+    + addTag(tag : Tag)
+    + removeTag(tag : Tag)
+}
+
+enum CategoryType {
+    RECIPE,
+    MEDIA,
+    LOCATION,
+    PRODUCT
+}
+
+class  Category {
+    - id : Long
+    - categoryType : CategoryType
+    - tagGroups : List<TagGroup>
+    + constructor()
+    + getter()
+    + setter()
+}
+
+class TagGroup {
+    - id : Long
+    - tagGroupName : String
+    - category : Category
+    - tags : List<Tag>
+    + constructor()
+    + getter()
+    + setter()
+    + addTag(tag : Tag)
+    + removeTag(tag : Tag)
+}
+
+class Tag {
+    - id : Long
+    - tagName : String
+    - tagGroup : TagGroup
+    + constructor()
+    + getter()
+    + setter()
+}
+
+User "2" --> "0..*" Contact
+User "1" --> "0..*" Recommendation : <<creates>>
+
+Contact ..> ContactStatus
+
+RecommendationAssignment "0..*" ---> "1" User
+RecommendationAssignment "0..*" ---> "1" Recommendation
+RecommendationAssignment .> RecommendationStatus
+
+Recommendation "1" o-- "1" Category
+Recommendation "1" o-- "0..*" Tag
+
+Category ..> CategoryType
+TagGroup "0..*" --> "1" Category
+Tag "0..*" --> "1" TagGroup
+
+@enduml
