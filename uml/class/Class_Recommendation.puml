@@ -6,9 +6,11 @@ class Recommendation {
     - id : Long
     - title : String
     - description : String
+    - url : URI
     - creator : User
     - creationDate : LocalDateTime
     - category : Category
+    - imgPath : String
     - tags : Set<Tag>
     + constructor()
     + getter()
