@@ -13,12 +13,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Global exception handler for the application.
+ * Catches and handles common exceptions thrown across controllers and returns
+ * structured error responses with meaningful messages.
+ */
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     private final MessageUtil messageUtil;
 
+    /**
+     * Handles custom {@link ValidationException} thrown within business logic.
+     *
+     * @param ex the validation exception
+     * @return a 400 Bad Request response with validation errors
+     */
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
         return ResponseEntity.badRequest().body(Map.of(
@@ -27,6 +38,12 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    /**
+     * Handles validation errors triggered by {@code @Valid} annotated parameters.
+     *
+     * @param ex the exception containing field validation errors
+     * @return a 400 Bad Request response with field-specific error messages
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         var errors = ex.getBindingResult().getFieldErrors().stream()
@@ -42,15 +59,29 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    /**
+     * Handles uncaught {@link RuntimeException} instances.
+     *
+     * @param ex the runtime exception
+     * @return a 400 Bad Request response
+     */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", ex.getMessage()));
+                .body(Map.of(
+                        "message", messageUtil.get("exception.badrequest")));
     }
 
+    /**
+     * Handles all other unhandled exceptions.
+     *
+     * @param ex the exception
+     * @return a 500 Internal Server Error response
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("message", messageUtil.get("exception.internal")));
+                .body(Map.of(
+                        "message", messageUtil.get("exception.internal")));
     }
 }

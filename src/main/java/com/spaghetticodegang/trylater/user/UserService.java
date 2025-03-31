@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Service layer for handling user-related business logic.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -20,6 +23,13 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final MessageUtil messageUtil;
 
+    /**
+     * Registers a new user if the provided email and username are not already in use.
+     *
+     * @param userMeRegistrationDto the user input data for registration
+     * @return a DTO containing the created user's public information
+     * @throws ValidationException if the email or username already exists
+     */
     public UserMeResponseDto registerUser(UserMeRegistrationDto userMeRegistrationDto) {
         final Map<String, String> errors = new HashMap<>();
 
