@@ -47,6 +47,8 @@ class RecommendationAssignment {
     - userId : Long
     - recommendationId : Long
     - recommendationAssignmentStatus : RecommendationAssignmentStatus
+    - receivedAt : LocalDateTime
+    - acceptedAt : LocalDateTime
     + constructor()
     + getter()
     + setter()

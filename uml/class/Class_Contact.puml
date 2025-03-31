@@ -12,6 +12,8 @@ class Contact {
     - status : ContactStatus
     - requester : User
     - receiver : User
+    - requestDate : LocalDateTime
+    - acceptDate : LocalDateTime
     + constructor()
     + getter()
     + setter()
