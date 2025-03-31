@@ -1,0 +1,61 @@
+package com.spaghetticodegang.trylater.user;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+class UserRepositoryTest {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    void shouldReturnTrue_whenEmailExists() {
+        User user = User.builder()
+                .userName("tester")
+                .displayName("tester")
+                .email("test@example.com")
+                .password("secure123")
+                .imgPath("/assets/user.webp")
+                .registrationDate(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+
+        boolean exists = userRepository.existsByEmail("test@example.com");
+
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenEmailDoesNotExist() {
+        boolean exists = userRepository.existsByEmail("doesnotexist@example.com");
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    void shouldReturnTrue_whenUserNameExists() {
+        User user = User.builder()
+                .userName("tester")
+                .displayName("tester")
+                .email("test@example.com")
+                .password("secure123")
+                .imgPath("/assets/user.webp")
+                .registrationDate(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+
+        boolean exists = userRepository.existsByUserName("tester");
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenUserNameDoesNotExist() {
+        boolean exists = userRepository.existsByUserName("nonexistent");
+        assertThat(exists).isFalse();
+    }
+}
