@@ -1,0 +1,23 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+database "PostgreSQL DB" as DB
+actor ImageController as IC
+
+(Bild hochladen) as (upload)
+(Profilbild ändern) as (change)
+(Bild speichern/laden) as (safe)
+(Bildausgabe) as (output)
+
+note bottom of (upload): Sowohl für Profilbild \nals auch Empfehlungsbild
+note bottom of (output): Sowohl für Profilbild \nals auch Empfehlungsbild
+
+Nutzer --> (upload)
+Nutzer -> (change)
+(upload) -> IC
+IC <--> (safe)
+(safe) --> DB
+(change) -> IC
+IC -> (output)
+
+@enduml
