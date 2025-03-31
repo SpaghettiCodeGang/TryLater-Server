@@ -133,4 +133,165 @@ ContactRepository --> Contact
 ContactService --> ContactRepository
 ContactController --> ContactService
 
+class Recommendation {
+    - id : Long
+    - title : String
+    - description : String
+    - imgPath : String
+    - creator : User
+    - creationDate : LocalDateTime
+    - url : URI
+    - rating : Int
+    - category : Category
+    - tags : Set<Tag>
+    + constructor()
+    + getter()
+    + setter()
+}
+interface RecommendationRepository {
+    - recommendations : Set<Recommendation>
+    + findById(recommendationId : Long) : Recommendation
+    + save(recommendation : Recommendation)
+    + update(recommendation : Recommendation)
+    + delete(recommendation : Recommendation)
+}
+class RecommendationService {
+    - userService : UserService
+    - recommendationRepository : RecommendationRepository
+    - recommendationAssignmentRepository : RecommendationAssignmentRepository
+    - categoryRepository : CategoryRepository
+    - tagGroupRepository : TagGroupRepository
+    - tagRepository : TagRepository
+    + getRecommendationById(recommendationId : Long)
+    + getRecommendationsByStatus(user : User, recommendationAssignmentStatus : RecommendationAssignmentStatus)
+    + createRecommendation(user : User, requestBody : RequestBody)
+    + createRecommendationAssignments(recommendation : Recommendation, receiver : Set<User>)
+    + updateRecommendationStatus(user : User, recommendationAssignmentStatus : RecommendationAssignmentStatus)
+}
+class RecommendationController {
+    + GET /api/recommendation() <<secured>>
+    + GET /api/recommendation/{id}() <<secured>>
+    + POST /api/recommendation() <<secured>>
+    + PUT /api/recommendation/{id}() <<secured>>
+}
+
+class RecommendationAssignment {
+    - userId : Long
+    - recommendationId : Long
+    - recommendationAssignmentStatus : RecommendationAssignmentStatus
+    + constructor()
+    + getter()
+    + setter()
+}
+interface RecommendationAssignmentRepository {
+    - recommendationAssignments : Set<RecommendationAssignment>
+    + findAllByUserAndStatus(user : User, status : RecommendationAssignmentStatus) : Set<RecommendationAssignment>
+    + save(recommendationAssignment : RecommendationAssignment)
+    + update(recommendationAssignment : RecommendationAssignment)
+    + delete(recommendationAssignment : RecommendationAssignment)
+}
+enum RecommendationAssignmentStatus {
+    SENT,
+    ACCEPTED
+}
+
+class Category {
+    - id : Long
+    - categoryType : CategoryType
+    - tagGroups : List<TagGroup>
+    + constructor()
+    + getter()
+    + setter()
+}
+interface CategoryRepository {
+    - categories : Set<Category>
+    + findByCategoryType(categoryType : CategoryType) : Category
+    + save(category : Category)
+    + update(category : Category)
+    + delete(category : Category)
+}
+enum CategoryType {
+    RECIPE,
+    MEDIA,
+    LOCATION,
+    PRODUCT
+}
+
+class TagGroup {
+    - id : Long
+    - tagGroupName : String
+    - category : Category
+    - tags : Set<Tag>
+    + constructor()
+    + getter()
+    + setter()
+}
+interface TagGroupRepository {
+    - tagGroups : Set<TagGroup>
+    + findByCategory(category : Category) : TagGroup
+    + findByTagGroupNameAndCategoryType(tagGroupName : String, categoryType : CategoryType) : TagGroup
+    + save(tagGroup : TagGroup)
+    + update(tagGroup : TagGroup)
+    + delete(tagGroup : TagGroup)
+}
+
+class Tag {
+    - id : Long
+    - tagName : String
+    - tagGroup : TagGroup
+    + constructor()
+    + getter()
+    + setter()
+}
+interface TagRepository {
+    - tags : Set<Tag>
+    + findByTagNameAndTagGroup(tagGroup : TagGroup, tagName : String) : Tag
+    + save(tag : Tag)
+    + update(tag : Tag)
+    + delete(tag : Tag)
+}
+class TagService {
+    - categoryRepository : CategoryRepository
+    - tagGroupRepository : TagGroupRepository
+    - tagRepository : TagRepository
+    + getTagsByCategory(category : Category) : Set<Tag>
+}
+class TagController {
+    + GET /api/tags() <<secured>>
+}
+
+Recommendation <-- RecommendationRepository
+RecommendationRepository <-- RecommendationService
+RecommendationService <-- RecommendationController
+
+RecommendationAssignmentStatus <.. RecommendationAssignment
+RecommendationAssignment <-- RecommendationAssignmentRepository
+RecommendationAssignmentRepository <-- RecommendationService
+
+CategoryType <.. Category
+Category <-- CategoryRepository
+CategoryRepository <-- RecommendationService
+CategoryRepository <-- TagService
+
+TagGroup <-- TagGroupRepository
+TagGroupRepository <-- RecommendationService
+TagGroupRepository <-- TagService
+
+Tag <-- TagRepository
+TagRepository <-- TagService
+TagRepository <-- RecommendationService
+TagService <-- TagController
+
+UserService <-- RecommendationService
+
+note left of RecommendationService
+    Kommuniziert mit dem UserService
+end note
+
+note left of TagController
+    Kann zukünftig, zum erstellen und bearbeiten der Kategorien,
+    Tag-Gruppen und Tags, um Admin-Routes erweitert werden.
+    Aktuell ist das erstellen durch einen Seed geplant.
+end note
+
 @enduml

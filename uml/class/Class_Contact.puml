@@ -9,9 +9,11 @@ enum ContactStatus {
 }
 class Contact {
     - id : Long
-    - status : ContactStatus
     - requester : User
     - receiver : User
+    - requestDate : LocalDateTime
+    - acceptDate : LocalDateTime
+    - status : ContactStatus
     + constructor()
     + getter()
     + setter()

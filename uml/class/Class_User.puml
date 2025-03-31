@@ -8,7 +8,8 @@ class User {
     - displayName : String
     - email : String
     - password : String
-    - imgId: Long
+    - imgPath: String
+    - registrationDate : LocalDateTime
     + constructor()
     + getter()
     + setter()
