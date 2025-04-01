@@ -4,6 +4,8 @@ import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,6 +58,33 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of(
                 "message", messageUtil.get("exception.validation"),
                 "errors", errors
+        ));
+    }
+
+    /**
+     * Handles authentication failures caused by incorrect passwords.
+     *
+     * @param ex the exception thrown when credentials are invalid
+     * @return a 401 Unauthorized response with a user-friendly error message
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                "message", messageUtil.get("auth.invalid.credentials")
+        ));
+    }
+
+    /**
+     * Handles authentication failures caused by non-existent usernames.
+     *
+     * @param ex the exception thrown when the user is not found
+     * @return a 404 Not Found response with a user-friendly error message
+     */
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex) {
+        String messageKey = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "message", messageUtil.get(messageKey)
         ));
     }
 

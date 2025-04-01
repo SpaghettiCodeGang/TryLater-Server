@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TrylaterApplication {
+public class TryLaterApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TrylaterApplication.class, args);
+		SpringApplication.run(TryLaterApplication.class, args);
 	}
 
 }

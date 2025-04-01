@@ -5,6 +5,9 @@ import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +20,17 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MessageUtil messageUtil;
+
+    @Override
+    public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
+        return userRepository.findByEmailOrUserName(input, input)
+                .orElseThrow(() -> new UsernameNotFoundException("auth.invalid.credentials"));
+    }
 
     /**
      * Registers a new user if the provided email and username are not already in use.
