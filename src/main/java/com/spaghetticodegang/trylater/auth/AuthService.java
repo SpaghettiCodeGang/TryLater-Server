@@ -11,6 +11,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service layer for handling authentication-related business logic.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -19,8 +22,20 @@ public class AuthService {
     private final UserService userService;
     private final JwtService jwtService;
 
+    /**
+     * Response returned after successful authentication.
+     *
+     * @param token the generated JWT
+     * @param user the authenticated user's public profile data
+     */
     public record AuthResponseDto(String token, UserMeResponseDto user) {}
 
+    /**
+     * Authenticates the user and returns a JWT along with user profile data.
+     *
+     * @param authRequestDto the login credentials
+     * @return the JWT and the authenticated user's public information
+     */
     public AuthResponseDto login(AuthRequestDto authRequestDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

@@ -18,6 +18,12 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Returns the public profile information of the currently authenticated user.
+     *
+     * @param user the currently authenticated user (injected by Spring Security)
+     * @return the authenticated user's public information
+     */
     @GetMapping("/me")
     public ResponseEntity<UserMeResponseDto> getUserMe(@AuthenticationPrincipal User user) {
         UserMeResponseDto userMeResponseDto = userService.createUserMeResponseDto(user);

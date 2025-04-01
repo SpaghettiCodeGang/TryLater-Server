@@ -26,12 +26,25 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final MessageUtil messageUtil;
 
+    /**
+     * Loads a user by username or email for authentication.
+     *
+     * @param input the username or email
+     * @return the user details
+     * @throws UsernameNotFoundException if no matching user is found
+     */
     @Override
     public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
         return userRepository.findByEmailOrUserName(input, input)
                 .orElseThrow(() -> new UsernameNotFoundException("auth.invalid.credentials"));
     }
 
+    /**
+     * Maps a {@link User} entity to a public response DTO.
+     *
+     * @param user the user entity
+     * @return the user's public profile information
+     */
     public UserMeResponseDto createUserMeResponseDto(User user) {
         return UserMeResponseDto.builder()
                 .id(user.getId())

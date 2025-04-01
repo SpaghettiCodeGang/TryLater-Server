@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * JPA entity representing a user of the system.
+ * Implements {@link UserDetails} for Spring Security integration.
+ */
 @Getter
 @Setter
 @Entity
@@ -40,6 +44,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDateTime registrationDate;
 
+    /**
+     * Returns an empty list of authorities. This application does not use roles yet.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -50,11 +57,18 @@ public class User implements UserDetails {
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled() { return true; }
 
-    // Benötigt für UserDetails-Interface
+    /**
+     * Returns the unique username used by Spring Security for authentication.
+     * In this case, it is the user's email.
+     */
     @Override public String getUsername() { return email; }
 
-    // Wird scheinbar wegen getUsername() nicht von Lombok generiert
-    public String getUserName() {
+    /**
+     * Returns the actual username (used for display or registration).
+     * Must be declared explicitly due to method name conflict with {@link UserDetails#getUsername()}.
+     *
+     * @return the internal username
+     */    public String getUserName() {
         return userName;
     }
 }

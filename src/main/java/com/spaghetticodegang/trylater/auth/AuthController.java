@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller providing endpoints for authentication management.
+ */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -16,6 +19,13 @@ public class AuthController {
     private final AuthCookieService authCookieService;
     private final AuthService authService;
 
+    /**
+     * Handles the user login request by delegating to the service layer.
+     *
+     * @param authRequestDto the credentials provided by the user
+     * @param response the HTTP servlet response used to attach the auth cookie
+     * @return the authenticated user's public information
+     */
     @PostMapping("/login")
     public ResponseEntity<UserMeResponseDto> login(@RequestBody @Valid AuthRequestDto authRequestDto, HttpServletResponse response) {
         AuthService.AuthResponseDto authResponseDto = authService.login(authRequestDto);

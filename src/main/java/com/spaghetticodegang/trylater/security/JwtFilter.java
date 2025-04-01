@@ -18,6 +18,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filter that extracts JWT from cookies and sets the security context
+ * for authenticated requests.
+ */
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -31,36 +35,20 @@ public class JwtFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String jwt = extractJwtFromCookies(request);
+        String jwt = extractJwtFromCookies(request);
 
         if (jwt == null || jwt.isBlank()) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String username;
-        try {
-            username = jwtService.extractUsernameFromToken(jwt);
-        } catch (Exception e) {
+        String username = extractUsernameFromToken(jwt);
+        if (username == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        } catch (UsernameNotFoundException e) {
-            authCookieService.clearAuthCookie(response);
+        if (!authenticate(username, request, response)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,6 +56,12 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Extracts the JWT token from request cookies.
+     *
+     * @param request the HTTP servlet request
+     * @return the JWT or null if not present
+     */
     private String extractJwtFromCookies(HttpServletRequest request) {
         String jwt = null;
         if (request.getCookies() != null) {
@@ -79,5 +73,45 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
         return jwt;
+    }
+
+    /**
+     * Extracts the username from the given JWT.
+     *
+     * @param jwt the JWT token
+     * @return the username or null if invalid
+     */
+    private String extractUsernameFromToken(String jwt) {
+        try {
+            return jwtService.extractUsernameFromToken(jwt);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Authenticates the user and sets the security context.
+     *
+     * @param username the username extracted from the JWT
+     * @param request the HTTP servlet request
+     * @param response the HTTP servlet response
+     * @return true if authentication was successful, false otherwise
+     */
+    private boolean authenticate(String username, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            return true;
+        } catch (UsernameNotFoundException ex) {
+            authCookieService.clearAuthCookie(response);
+            return false;
+        }
     }
 }
