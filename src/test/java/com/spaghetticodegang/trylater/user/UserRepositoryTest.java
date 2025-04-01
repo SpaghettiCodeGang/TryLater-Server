@@ -15,6 +15,25 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
+    void shouldFindUserByEmailOrUserName() {
+        User user = User.builder()
+                .userName("tester")
+                .displayName("tester")
+                .email("test@example.com")
+                .password("secure123")
+                .imgPath("/assets/user.webp")
+                .registrationDate(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+
+        var byEmail = userRepository.findByEmailOrUserName("test@example.com", "notUsed");
+        var byUserName = userRepository.findByEmailOrUserName("notUsed", "tester");
+
+        assertThat(byEmail).isPresent();
+        assertThat(byUserName).isPresent();
+    }
+
+    @Test
     void shouldReturnTrue_whenEmailExists() {
         User user = User.builder()
                 .userName("tester")

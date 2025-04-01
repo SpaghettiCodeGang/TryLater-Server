@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,56 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Test
+    void shouldLoadUserByUsernameOrEmail() {
+        User user = User.builder()
+                .email("test@example.com")
+                .userName("tester")
+                .password("secure123")
+                .build();
+
+        when(userRepository.findByEmailOrUserName("test@example.com", "test@example.com"))
+                .thenReturn(java.util.Optional.of(user));
+
+        var loaded = userService.loadUserByUsername("test@example.com");
+
+        assertNotNull(loaded);
+        assertEquals("test@example.com", loaded.getUsername()); // Spring Security's getUsername()
+    }
+
+    @Test
+    void shouldThrowException_whenUserNotFound() {
+        when(userRepository.findByEmailOrUserName("unknown", "unknown")).thenReturn(java.util.Optional.empty());
+
+        var ex = assertThrows(UsernameNotFoundException.class, () -> {
+            userService.loadUserByUsername("unknown");
+        });
+
+        assertEquals("auth.invalid.credentials", ex.getMessage());
+    }
+
+
+    @Test
+    void shouldMapUserToUserMeResponseDto() {
+        User user = User.builder()
+                .id(1L)
+                .userName("tester")
+                .displayName("Tester")
+                .email("test@example.com")
+                .imgPath("/assets/user.webp")
+                .registrationDate(LocalDateTime.now())
+                .password("irrelevant")
+                .build();
+
+        var dto = userService.createUserMeResponseDto(user);
+
+        assertEquals(1L, dto.getId());
+        assertEquals("tester", dto.getUserName());
+        assertEquals("Tester", dto.getDisplayName());
+        assertEquals("test@example.com", dto.getEmail());
+        assertEquals("/assets/user.webp", dto.getImgPath());
+    }
 
     @Test
     void shouldThrowValidationException_whenEmailExists() {
