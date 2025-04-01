@@ -50,11 +50,9 @@ class AuthServiceTest {
 
         var result = authService.login(authDto);
 
-        // Assertions
         assertThat(result.token()).isEqualTo("jwt-token");
         assertThat(result.user().getUserName()).isEqualTo("tester");
 
-        // Verify interaction
         ArgumentCaptor<UsernamePasswordAuthenticationToken> tokenCaptor =
                 ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
 
@@ -62,6 +60,6 @@ class AuthServiceTest {
         UsernamePasswordAuthenticationToken capturedToken = tokenCaptor.getValue();
 
         assertThat(capturedToken.getName()).isEqualTo("tester");
-        assertThat(capturedToken.getCredentials()).isEqualTo("password");
+        assertThat(capturedToken.getCredentials()).isEqualTo("secure123");
     }
 }
