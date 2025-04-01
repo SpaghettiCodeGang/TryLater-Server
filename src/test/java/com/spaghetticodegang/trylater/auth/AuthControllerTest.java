@@ -10,14 +10,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import jakarta.servlet.http.HttpServletResponse;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -72,5 +72,14 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.userName").value("tester"))
                 .andExpect(jsonPath("$.email").value("tester@example.com"))
                 .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("token=mocked.jwt.token")));
+    }
+
+    @Test
+    @WithMockUser(username = "tester") // Simuliert eingeloggten User
+    void shouldLogoutUserAndClearCookie() throws Exception {
+        mockMvc.perform(post("/api/auth/logout"))
+                .andExpect(status().isNoContent());
+
+        verify(authCookieService).clearAuthCookie(org.mockito.ArgumentMatchers.any(HttpServletResponse.class));
     }
 }
