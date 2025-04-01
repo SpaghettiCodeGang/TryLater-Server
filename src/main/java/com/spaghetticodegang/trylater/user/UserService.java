@@ -32,6 +32,16 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("auth.invalid.credentials"));
     }
 
+    public UserMeResponseDto createUserMeResponseDto(User user) {
+        return UserMeResponseDto.builder()
+                .id(user.getId())
+                .userName(user.getUserName())
+                .displayName(user.getDisplayName())
+                .imgPath(user.getImgPath())
+                .email(user.getEmail())
+                .build();
+    }
+
     /**
      * Registers a new user if the provided email and username are not already in use.
      *
@@ -65,14 +75,7 @@ public class UserService implements UserDetailsService {
                 .build();
 
         userRepository.save(user);
-
-        return UserMeResponseDto.builder()
-                .id(user.getId())
-                .userName(user.getUserName())
-                .displayName(user.getDisplayName())
-                .imgPath(user.getImgPath())
-                .email(user.getEmail())
-                .build();
+        return createUserMeResponseDto(user);
     }
 
 }
