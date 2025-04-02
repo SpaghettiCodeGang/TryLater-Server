@@ -9,7 +9,7 @@ class User {
     - displayName : String
     - email : String
     - password : String
-    - imgId: Long
+    - imgPath: String
     - registrationDate : LocalDateTime
     + constructor()
     + getter()
@@ -60,13 +60,13 @@ enum RecommendationStatus {
 
 class Recommendation {
     - id : Long
-    - name : String
+    - title : String
     - description : String
-    - imgId : String
+    - imgPath : String
     - creator : User
+    - creationDate : LocalDateTime
     - url : URI
     - rating : Int
-    - creationDate : LocalDateTime
     - category : Category
     - tags : List<Tag>
     + constructor()

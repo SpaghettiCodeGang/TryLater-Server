@@ -7,8 +7,11 @@ class Recommendation {
     - title : String
     - description : String
     - url : URI
+    - imgPath : String
     - creator : User
     - creationDate : LocalDateTime
+    - url : URI
+    - rating : Int
     - category : Category
     - imgPath : String
     - tags : Set<Tag>
@@ -55,7 +58,7 @@ class RecommendationAssignment {
 }
 interface RecommendationAssignmentRepository {
     - recommendationAssignments : Set<RecommendationAssignment>
-    + findAllByUserAndRecommendationAssignmentStatus(user : User, recommendationAssignmentStatus : RecommendationAssignmentStatus) : Set<RecommendationAssignment>
+    + findAllByUserAndStatus(user : User, status : RecommendationAssignmentStatus) : Set<RecommendationAssignment>
     + save(recommendationAssignment : RecommendationAssignment)
     + update(recommendationAssignment : RecommendationAssignment)
     + delete(recommendationAssignment : RecommendationAssignment)
@@ -68,6 +71,7 @@ enum RecommendationAssignmentStatus {
 class Category {
     - id : Long
     - categoryType : CategoryType
+    - tagGroups : List<TagGroup>
     + constructor()
     + getter()
     + setter()

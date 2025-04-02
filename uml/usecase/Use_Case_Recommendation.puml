@@ -1,5 +1,10 @@
 @startuml
-'https://plantuml.com/use-case-diagram
+skinparam classAttributeIconSize 0
+hide empty members
+
+database "PostgreSQL DB" as DB
+actor Sender as SE
+actor Empfänger as EM
 
 package "Empfehlung geben"{
 "Empfehlung\nerstellen" as (create)
@@ -12,20 +17,20 @@ package "Empfehlung erhalten"{
 }
 (Empfehlung\nansehen) as (lookup)
 
-User --> (create)
+SE -u-> (create)
 (create) <. (send) :extend
-User -> (send)
+SE -> (send)
 
-User -> (receive)
-(send) <.. (receive) :extend
-User -> (safe)
-DB_System --> (safe)
+EM -> (receive)
+(send) <... (receive) :extend
+EM -> (safe)
+DB -u-> (safe)
 (receive) ..> (safe)
-User --> (decline)
+EM --> (decline)
 (receive) ..> (decline)
 
-User -> (lookup)
-DB_System -> (lookup)
-(safe) <. (lookup) :extend
+EM -> (lookup)
+DB -> (lookup)
+(safe) <.. (lookup) :extend
 
 @enduml
