@@ -89,6 +89,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles authentication failures caused by non-existent contacts.
+     *
+     * @param ex the exception thrown when the contact is not found
+     * @return a 404 Not Found response with a user-friendly error message
+     */
+    @ExceptionHandler(ContactNotFoundException.class)
+    public ResponseEntity<Object> handleContactNotFound(ContactNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "message", messageUtil.get(ex.getMessage())
+        ));
+    }
+
+
+    /**
      * Handles uncaught {@link RuntimeException} instances.
      *
      * @param ex the runtime exception
