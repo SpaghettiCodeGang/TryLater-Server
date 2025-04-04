@@ -9,7 +9,7 @@ enum GroupMemberStatus {
 }
 
 class GroupMember {
-    - id : Long
+    - id : UUID
     - user : User
     - group : Group
     - status : GroupMemberStatus
@@ -19,7 +19,7 @@ class GroupMember {
 }
 
 class Group {
-    - id : Long
+    - id : UUID
     - groupName : String
     - groupOwner : User
     - groupMember : GroupMember[]

@@ -3,7 +3,7 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 class User {
-    - id : Long
+    - id : UUID
     - userName : String
     - displayName : String
     - email : String

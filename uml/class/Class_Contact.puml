@@ -8,7 +8,7 @@ enum ContactStatus {
     BLOCKED
 }
 class Contact {
-    - id : Long
+    - id : UUID
     - requester : User
     - receiver : User
     - requestDate : LocalDateTime

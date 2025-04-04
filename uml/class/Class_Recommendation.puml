@@ -3,7 +3,7 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 class Recommendation {
-    - id : Long
+    - id : UUID
     - title : String
     - description : String
     - url : URI
@@ -47,7 +47,7 @@ class RecommendationController {
 }
 
 class RecommendationAssignment {
-    - userId : Long
+    - userId : UUID
     - recommendationId : Long
     - recommendationAssignmentStatus : RecommendationAssignmentStatus
     - receivedAt : LocalDateTime
@@ -69,7 +69,7 @@ enum RecommendationAssignmentStatus {
 }
 
 class Category {
-    - id : Long
+    - id : UUID
     - categoryType : CategoryType
     - tagGroups : List<TagGroup>
     + constructor()
@@ -91,7 +91,7 @@ enum CategoryType {
 }
 
 class TagGroup {
-    - id : Long
+    - id : UUID
     - tagGroupName : String
     - category : Category
     - tags : Set<Tag>
@@ -109,7 +109,7 @@ interface TagGroupRepository {
 }
 
 class Tag {
-    - id : Long
+    - id : UUID
     - tagName : String
     - tagGroup : TagGroup
     + constructor()
