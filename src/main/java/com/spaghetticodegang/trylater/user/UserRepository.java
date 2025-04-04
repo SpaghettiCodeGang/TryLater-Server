@@ -2,10 +2,21 @@ package com.spaghetticodegang.trylater.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 /**
  * Repository interface for accessing and managing user entities in the database.
  */
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    /**
+     * Retrieves a user by email or username.
+     *
+     * @param email the email to search for
+     * @param userName the username to search for
+     * @return an {@link Optional} containing the user if found, or empty if not
+     */
+    Optional<User> findByEmailOrUserName(String email, String userName);
 
     /**
      * Checks whether a user with the given email already exists.

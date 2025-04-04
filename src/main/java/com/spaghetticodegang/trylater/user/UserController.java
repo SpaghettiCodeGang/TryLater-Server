@@ -5,10 +5,8 @@ import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller providing endpoints for user management.
@@ -19,6 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+
+    /**
+     * Returns the public profile information of the currently authenticated user.
+     *
+     * @param user the currently authenticated user (injected by Spring Security)
+     * @return the authenticated user's public information
+     */
+    @GetMapping("/me")
+    public ResponseEntity<UserMeResponseDto> getUserMe(@AuthenticationPrincipal User user) {
+        UserMeResponseDto userMeResponseDto = userService.createUserMeResponseDto(user);
+        return ResponseEntity.ok(userMeResponseDto);
+    }
 
     /**
      * Handles the user registration request by delegating to the service layer.
