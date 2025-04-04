@@ -4,6 +4,7 @@ import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
+import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,10 +41,41 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Maps a {@link User} entity to a public response DTO.
+     * Finds a user by their unique ID.
+     *
+     * @param userId the ID of the user
+     * @return the user entity
+     * @throws UsernameNotFoundException if the user is not found
+     */
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("user.not.found"));
+
+    }
+
+    /**
+     * Creates a public-facing user DTO from a {@link User} entity.
+     * Intended for returning limited user info (e.g. in contact lists).
      *
      * @param user the user entity
-     * @return the user's public profile information
+     * @return a public response DTO
+     */
+    public UserResponseDto createUserResponseDto(User user) {
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .userName(user.getUserName())
+                .displayName(user.getDisplayName())
+                .imgPath(user.getImgPath())
+                .build();
+    }
+
+    /**
+     * Creates a detailed user DTO from a {@link User} entity,
+     * including sensitive fields like email.
+     * Intended for authenticated users accessing their own profile.
+     *
+     * @param user the user entity
+     * @return a full response DTO for the currently authenticated user
      */
     public UserMeResponseDto createUserMeResponseDto(User user) {
         return UserMeResponseDto.builder()

@@ -50,6 +50,26 @@ class UserServiceTest {
     }
 
     @Test
+    void shouldFindUserById() {
+        User user = User.builder().id(1L).userName("tester").build();
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
+
+        var result = userService.findUserById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+    }
+
+    @Test
+    void shouldThrowException_whenUserIdNotFound() {
+        when(userRepository.findById(99L)).thenReturn(java.util.Optional.empty());
+
+        var ex = assertThrows(UsernameNotFoundException.class, () -> userService.findUserById(99L));
+        assertEquals("user.not.found", ex.getMessage());
+    }
+
+
+    @Test
     void shouldThrowException_whenUserNotFound() {
         when(userRepository.findByEmailOrUserName("unknown", "unknown")).thenReturn(java.util.Optional.empty());
 
@@ -60,6 +80,22 @@ class UserServiceTest {
         assertEquals("auth.invalid.credentials", ex.getMessage());
     }
 
+    @Test
+    void shouldMapUserToUserResponseDto() {
+        User user = User.builder()
+                .id(2L)
+                .userName("tester")
+                .displayName("tester")
+                .imgPath("/assets/user.webp")
+                .build();
+
+        var dto = userService.createUserResponseDto(user);
+
+        assertEquals(2L, dto.getId());
+        assertEquals("tester", dto.getUserName());
+        assertEquals("tester", dto.getDisplayName());
+        assertEquals("/assets/user.webp", dto.getImgPath());
+    }
 
     @Test
     void shouldMapUserToUserMeResponseDto() {

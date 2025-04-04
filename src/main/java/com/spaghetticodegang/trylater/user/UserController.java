@@ -4,6 +4,7 @@ import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +22,12 @@ public class UserController {
     /**
      * Returns the public profile information of the currently authenticated user.
      *
-     * @param user the currently authenticated user (injected by Spring Security)
+     * @param me the currently authenticated user (injected by Spring Security)
      * @return the authenticated user's public information
      */
     @GetMapping("/me")
-    public ResponseEntity<UserMeResponseDto> getUserMe(@AuthenticationPrincipal User user) {
-        UserMeResponseDto userMeResponseDto = userService.createUserMeResponseDto(user);
+    public ResponseEntity<UserMeResponseDto> getUserMe(@AuthenticationPrincipal User me) {
+        UserMeResponseDto userMeResponseDto = userService.createUserMeResponseDto(me);
         return ResponseEntity.ok(userMeResponseDto);
     }
 
@@ -39,6 +40,6 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserMeResponseDto> registerUser(@RequestBody @Valid UserMeRegistrationDto userMeRegistrationDto) {
         UserMeResponseDto userMeResponseDto = userService.registerUser(userMeRegistrationDto);
-        return ResponseEntity.ok(userMeResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userMeResponseDto);
     }
 }
