@@ -2,16 +2,14 @@ package com.spaghetticodegang.trylater.contact;
 
 import com.spaghetticodegang.trylater.contact.dto.ContactRequestDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactResponseDto;
+import com.spaghetticodegang.trylater.contact.dto.ContactStatusRequestDto;
 import com.spaghetticodegang.trylater.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller providing endpoints for managing user contacts.
@@ -34,5 +32,19 @@ public class ContactController {
     public ResponseEntity<ContactResponseDto> createContact(@AuthenticationPrincipal User me, @RequestBody @Valid ContactRequestDto request) {
         ContactResponseDto contactResponseDto = contactService.createContact(me, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(contactResponseDto);
+    }
+
+    /**
+     * Updates the status of a contact by delegating the request to the service layer.
+     *
+     * @param me the currently authenticated user
+     * @param contactId the ID of the contact whose status is to be updated
+     * @param contactStatus the new contact status provided by the user
+     * @return the updated contact as a response DTO
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<ContactResponseDto> updateContactStatus(@AuthenticationPrincipal User me,@PathVariable("id") Long contactId, @RequestBody @Valid ContactStatusRequestDto contactStatus) {
+        ContactResponseDto contactResponseDto = contactService.updateContactStatus(me, contactId, contactStatus);
+        return ResponseEntity.ok(contactResponseDto);
     }
 }

@@ -2,6 +2,7 @@ package com.spaghetticodegang.trylater.contact;
 
 import com.spaghetticodegang.trylater.contact.dto.ContactRequestDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactResponseDto;
+import com.spaghetticodegang.trylater.contact.dto.ContactStatusRequestDto;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.User;
@@ -33,16 +34,53 @@ class ContactServiceTest {
     @InjectMocks
     private ContactService contactService;
 
+    private User createUser(Long id) {
+        return User.builder()
+                .id(id)
+                .userName("user" + id)
+                .build();
+    }
+
+    private ContactRequestDto createContactRequest(Long targetId) {
+        ContactRequestDto dto = new ContactRequestDto();
+        dto.setTargetUserId(targetId);
+        return dto;
+    }
+
+    private ContactStatusRequestDto createContactStatusRequest(ContactStatus status) {
+        ContactStatusRequestDto dto = new ContactStatusRequestDto();
+        dto.setContactStatus(status);
+        return dto;
+    }
+
+    private Contact createContact(User requester, User receiver) {
+        return Contact.builder()
+                .id(99L)
+                .requester(requester)
+                .receiver(receiver)
+                .contactStatus(ContactStatus.PENDING)
+                .requestDate(LocalDateTime.now())
+                .build();
+    }
+
+    private UserResponseDto createUserResponse(User user) {
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .userName(user.getUserName())
+                .displayName(user.getUserName())
+                .imgPath("/assets/user.webp")
+                .build();
+    }
+
     @Test
     void shouldThrowValidationException_whenTargetUserIsSelf() {
-        User me = User.builder().id(1L).build();
-        ContactRequestDto request = new ContactRequestDto();
-        request.setTargetUserId(1L);
+        User requester = createUser(1L);
+        ContactRequestDto request = createContactRequest(1L);
 
         when(messageUtil.get("contact.error.self.add")).thenReturn("Du kannst dich nicht selbst als Kontakt hinzufügen.");
 
         ValidationException ex = assertThrows(ValidationException.class, () -> {
-            contactService.createContact(me, request);
+            contactService.createContact(requester, request);
         });
 
         assertTrue(ex.getErrors().containsKey("targetUserId"));
@@ -51,15 +89,14 @@ class ContactServiceTest {
 
     @Test
     void shouldThrowValidationException_whenContactAlreadyExists() {
-        User me = User.builder().id(1L).build();
-        ContactRequestDto request = new ContactRequestDto();
-        request.setTargetUserId(2L);
+        User requester = createUser(1L);
+        ContactRequestDto request = createContactRequest(2L);
 
         when(contactRepository.existsByUserIds(1L, 2L)).thenReturn(true);
         when(messageUtil.get("contact.error.already.exists")).thenReturn("Der Kontakt besteht bereits oder wurde bereits angefragt.");
 
         ValidationException ex = assertThrows(ValidationException.class, () -> {
-            contactService.createContact(me, request);
+            contactService.createContact(requester, request);
         });
 
         assertTrue(ex.getErrors().containsKey("targetUserId"));
@@ -68,33 +105,18 @@ class ContactServiceTest {
 
     @Test
     void shouldCreateContactSuccessfully() {
-        User me = User.builder().id(1L).build();
-        User target = User.builder().id(2L).build();
-        ContactRequestDto request = new ContactRequestDto();
-        request.setTargetUserId(2L);
-
-        Contact savedContact = Contact.builder()
-                .id(99L)
-                .requester(me)
-                .receiver(target)
-                .contactStatus(ContactStatus.PENDING)
-                .requestDate(LocalDateTime.now())
-                .build();
+        User requester = createUser(1L);
+        User receiver = createUser(2L);
+        ContactRequestDto request = createContactRequest(2L);
+        Contact savedContact = createContact(requester, receiver);
+        UserResponseDto contactPartnerDto = createUserResponse(receiver);
 
         when(contactRepository.existsByUserIds(1L, 2L)).thenReturn(false);
-        when(userService.findUserById(2L)).thenReturn(target);
+        when(userService.findUserById(2L)).thenReturn(receiver);
         when(contactRepository.save(any(Contact.class))).thenReturn(savedContact);
+        when(userService.createUserResponseDto(receiver)).thenReturn(contactPartnerDto);
 
-        UserResponseDto contactPartnerDto = UserResponseDto.builder()
-                .id(2L)
-                .userName("target")
-                .displayName("target")
-                .imgPath("/assets/user.webp")
-                .build();
-
-        when(userService.createUserResponseDto(target)).thenReturn(contactPartnerDto);
-
-        ContactResponseDto result = contactService.createContact(me, request);
+        ContactResponseDto result = contactService.createContact(requester, request);
 
         assertNotNull(result);
         assertEquals(contactPartnerDto, result.getContactPartner());
@@ -102,29 +124,39 @@ class ContactServiceTest {
     }
 
     @Test
+    void shouldUpdateContactStatusSuccessfully() {
+        User requester = createUser(1L);
+        User receiver = createUser(2L);
+        Contact contact = createContact(requester, receiver);
+        ContactStatusRequestDto requestDto = createContactStatusRequest(ContactStatus.ACCEPTED);
+        UserResponseDto contactPartnerDto = createUserResponse(requester);
+
+        when(contactRepository.findById(99L)).thenReturn(java.util.Optional.of(contact));
+        when(contactRepository.save(any(Contact.class))).thenReturn(contact);
+        when(userService.createUserResponseDto(requester)).thenReturn(contactPartnerDto);
+
+        ContactResponseDto result = contactService.updateContactStatus(receiver, 99L, requestDto);
+
+        assertNotNull(result);
+        assertEquals(ContactStatus.ACCEPTED, result.getContactStatus());
+        assertEquals(99L, result.getContactId());
+        assertEquals(contactPartnerDto, result.getContactPartner());
+        assertNotNull(contact.getAcceptDate());
+    }
+
+
+    @Test
     void shouldCreateContactResponseDtoWithCorrectPartner() {
-        User me = User.builder().id(1L).build();
-        User other = User.builder().id(2L).build();
+        User me = createUser(1L);
+        User target = createUser(2L);
+        Contact contact = createContact(me, target);
+        UserResponseDto contactPartnerDto = createUserResponse(target);
 
-        Contact contact = Contact.builder()
-                .id(10L)
-                .requester(other)
-                .receiver(me)
-                .contactStatus(ContactStatus.PENDING)
-                .build();
-
-        UserResponseDto contactPartnerDto = UserResponseDto.builder()
-                .id(2L)
-                .userName("partner")
-                .displayName("Partner")
-                .imgPath("/assets/user.webp")
-                .build();
-
-        when(userService.createUserResponseDto(other)).thenReturn(contactPartnerDto);
+        when(userService.createUserResponseDto(target)).thenReturn(contactPartnerDto);
 
         ContactResponseDto result = contactService.createContactResponseDto(me, contact);
 
-        assertEquals(10L, result.getContactId());
+        assertEquals(99L, result.getContactId());
         assertEquals(ContactStatus.PENDING, result.getContactStatus());
         assertEquals(contactPartnerDto, result.getContactPartner());
     }
