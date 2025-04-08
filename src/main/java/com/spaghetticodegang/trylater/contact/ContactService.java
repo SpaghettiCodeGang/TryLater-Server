@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Service layer for handling business logic related to user contacts.
@@ -103,6 +104,10 @@ public class ContactService {
     public ContactResponseDto updateContactStatus(User me, Long contactId, ContactStatusRequestDto contactStatusRequestDto) {
         final ContactStatus contactStatus= contactStatusRequestDto.getContactStatus();
         final Contact contact = findContactById(contactId);
+
+        if (!Objects.equals(contact.getRequester().getId(), me.getId()) && !Objects.equals(contact.getReceiver().getId(), me.getId())) {
+            throw new ValidationException(Map.of("contact", messageUtil.get("contact.error.user.not.found")));
+        }
 
         if (contactStatus == ContactStatus.PENDING) {
             throw new ValidationException(Map.of("contactStatus", messageUtil.get("contact.error.status.revert.to.pending")));
