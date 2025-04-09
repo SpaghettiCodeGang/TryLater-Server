@@ -9,6 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 public class SeedCategoryDto {
+
     private CategoryType categoryType;
     private List<SeedTagGroupDto> tagGroups;
+
 }
