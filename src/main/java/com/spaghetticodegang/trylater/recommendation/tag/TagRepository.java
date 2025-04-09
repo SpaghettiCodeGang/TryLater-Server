@@ -1,6 +1,6 @@
 package com.spaghetticodegang.trylater.recommendation.tag;
 
-import com.spaghetticodegang.trylater.recommendation.taggroup.TagGroup;
+import com.spaghetticodegang.trylater.recommendation.tag.group.TagGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
