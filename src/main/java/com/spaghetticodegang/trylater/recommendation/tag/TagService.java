@@ -20,7 +20,7 @@ public class TagService {
 
     public Tag getTagById(Long tagId) {
         return tagRepository.findById(tagId)
-                .orElseThrow(() -> new ValidationException(Map.of("tags", messageUtil.get("tag.not.found"))));
+                .orElseThrow(() -> new ValidationException(Map.of("tag", messageUtil.get("recommendation.tag.not.found"))));
     }
 
     /**
