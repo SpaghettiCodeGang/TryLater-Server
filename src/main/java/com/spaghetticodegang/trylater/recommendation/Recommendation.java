@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class Recommendation {
 
     private String imgPath;
 
-    private URL url;
+    private String url;
 
     @Min(1)
     @Max(3)

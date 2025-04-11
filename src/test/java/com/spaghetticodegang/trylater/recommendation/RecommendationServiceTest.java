@@ -21,8 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,20 +82,12 @@ class RecommendationServiceTest {
                 .title("recommendation")
                 .description("description")
                 .imgPath("./assets/img.png")
-                .url(createUrl("https://example.com"))
+                .url("https://www.example.com")
                 .rating(2)
                 .category(categoryType)
                 .tagIds(tagIds)
                 .receiverIds(receiverIds)
                 .build();
-    }
-
-    private URL createUrl(String value) {
-        try {
-            return new URI(value).toURL();
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     @Test

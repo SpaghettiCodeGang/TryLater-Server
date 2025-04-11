@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class RecommendationResponseDto {
     private String title;
     private String description;
     private String imgPath;
-    private URL url;
+    private String url;
     private int rating;
     private UserResponseDto creator;
     private LocalDateTime creationDate;
