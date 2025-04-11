@@ -21,8 +21,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.net.URI;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -72,7 +70,7 @@ class RecommendationControllerTest {
                 .title("recommendation")
                 .description("description")
                 .imgPath("/assets/img.webp")
-                .url(createUrl("https://example.com"))
+                .url("https://www.example.com")
                 .rating(2)
                 .creator(createCreatorDto())
                 .creationDate(LocalDateTime.now())
@@ -94,20 +92,12 @@ class RecommendationControllerTest {
                 .title("recommendation")
                 .description("description")
                 .imgPath("./assets/img.webp")
-                .url(createUrl("https://example.com"))
+                .url("https://www.example.com")
                 .rating(2)
                 .category(CategoryType.MEDIA)
                 .tagIds(List.of(10L))
                 .receiverIds(List.of(1L))
                 .build();
-    }
-
-    public static URL createUrl(String url) {
-        try {
-            return new URI(url).toURL();
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     @BeforeEach
