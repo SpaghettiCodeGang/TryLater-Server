@@ -1,11 +1,9 @@
-package com.spaghetticodegang.trylater.recommendation.taggroup;
+package com.spaghetticodegang.trylater.recommendation.tag.group;
 
 
 import com.spaghetticodegang.trylater.recommendation.category.Category;
 import com.spaghetticodegang.trylater.recommendation.category.CategoryRepository;
 import com.spaghetticodegang.trylater.recommendation.category.CategoryType;
-import com.spaghetticodegang.trylater.recommendation.tag.group.TagGroup;
-import com.spaghetticodegang.trylater.recommendation.tag.group.TagGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
