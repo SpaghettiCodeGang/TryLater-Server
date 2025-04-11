@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Map;
 import java.util.Objects;
@@ -98,6 +99,32 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleContactNotFound(ContactNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
                 "message", messageUtil.get(ex.getMessage())
+        ));
+    }
+
+    /**
+     * Handles failures caused by exceeding image size upload limit.
+     *
+     * @param ex the exception thrown when the image size is too big
+     * @return a 413 Payload Too Large response with a user-friendly error message
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(Map.of(
+                "message", messageUtil.get("image.upload.exceed.max.size")));
+    }
+
+    /**
+     * Handles failures caused by ioException while handling an image.
+     *
+     * @param ex the exception thrown when the image handle failed
+     * @return a 400 Bad Request response with a user-friendly error message
+     */
+    @ExceptionHandler(ImageHandleException.class)
+    public ResponseEntity<Object> handleImageHandleException(ImageHandleException ex) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "message", messageUtil.get("exception.image.handle"),
+                "errors", ex.getErrors()
         ));
     }
 
