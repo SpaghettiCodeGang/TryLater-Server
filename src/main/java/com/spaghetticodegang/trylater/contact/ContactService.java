@@ -27,21 +27,15 @@ public class ContactService {
     private final MessageUtil messageUtil;
 
     /**
-     * Creates a response DTO from a {@link Contact} entity.
-     * Determines which user is the contact partner (not the authenticated user).
+     * Checks whether a contact relationship exists between two users,
+     * regardless of which user was the requester or receiver.
      *
-     * @param me the authenticated user
-     * @param contact the contact entity
-     * @return a response DTO representing the contact
+     * @param userId1 the ID of the first user
+     * @param userId2 the ID of the second user
+     * @return true if a contact already exists between the two users, false otherwise
      */
-    public ContactResponseDto createContactResponseDto(User me, Contact contact) {
-        User contactPartner = contact.getRequester() == me ? contact.getReceiver() : contact.getRequester();
-
-        return ContactResponseDto.builder()
-                .contactId(contact.getId())
-                .contactPartner(userService.createUserResponseDto(contactPartner))
-                .contactStatus(contact.getContactStatus())
-                .build();
+    public boolean existsByUserIds(Long userId1, Long userId2) {
+        return contactRepository.existsByUserIds(userId1, userId2);
     }
 
     /**
@@ -125,6 +119,24 @@ public class ContactService {
         contactRepository.save(contact);
 
         return createContactResponseDto(me, contact);
+    }
+
+    /**
+     * Creates a response DTO from a {@link Contact} entity.
+     * Determines which user is the contact partner (not the authenticated user).
+     *
+     * @param me the authenticated user
+     * @param contact the contact entity
+     * @return a response DTO representing the contact
+     */
+    public ContactResponseDto createContactResponseDto(User me, Contact contact) {
+        User contactPartner = contact.getRequester() == me ? contact.getReceiver() : contact.getRequester();
+
+        return ContactResponseDto.builder()
+                .contactId(contact.getId())
+                .contactPartner(userService.createUserResponseDto(contactPartner))
+                .contactStatus(contact.getContactStatus())
+                .build();
     }
 
 }

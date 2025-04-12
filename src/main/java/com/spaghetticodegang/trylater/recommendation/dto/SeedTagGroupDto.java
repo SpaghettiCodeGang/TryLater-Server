@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class SeedTagGroupDto {
+
     private String tagGroupName;
     private List<String> tags;
 }
