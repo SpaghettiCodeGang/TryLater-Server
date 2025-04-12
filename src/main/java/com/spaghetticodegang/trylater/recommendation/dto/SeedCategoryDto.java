@@ -12,5 +12,4 @@ public class SeedCategoryDto {
 
     private CategoryType categoryType;
     private List<SeedTagGroupDto> tagGroups;
-
 }

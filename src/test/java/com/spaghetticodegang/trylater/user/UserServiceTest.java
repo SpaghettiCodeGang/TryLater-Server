@@ -157,7 +157,6 @@ class UserServiceTest {
         var dto = new UserMeRegistrationDto();
         dto.setEmail("test@example.com");
         dto.setUserName("tester");
-        dto.setDisplayName("tester");
         dto.setPassword("secure123");
 
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);

@@ -11,5 +11,4 @@ public class SeedTagGroupDto {
 
     private String tagGroupName;
     private List<String> tags;
-
 }
