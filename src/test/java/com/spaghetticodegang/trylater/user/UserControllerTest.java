@@ -90,7 +90,6 @@ class UserControllerTest {
 
         UserMeRegistrationDto requestDto = new UserMeRegistrationDto();
         requestDto.setUserName("tester");
-        requestDto.setDisplayName("Tester");
         requestDto.setEmail("tester@example.com");
         requestDto.setPassword("secure123");
 
