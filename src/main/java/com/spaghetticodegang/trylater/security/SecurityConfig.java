@@ -106,23 +106,11 @@ public class SecurityConfig {
                     .formLogin(AbstractHttpConfigurer::disable)
                     .logout(AbstractHttpConfigurer::disable)
                     .httpBasic(AbstractHttpConfigurer::disable)
+                    .cors(AbstractHttpConfigurer::disable)
 
                     // Enable H2 console frame support
                     .headers(headers ->
                             headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                    )
-
-                    // Configure CORS based on external origin config
-                    .cors(cors -> cors
-                            .configurationSource(request -> {
-                                CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
-                                config.setAllowedOrigins(List.of(allowedOrigin));
-                                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-                                config.setAllowCredentials(true);
-                                config.setAllowedHeaders(List.of("Content-Type", "X-Requested-With", "Authorization"));
-                                config.setExposedHeaders(List.of("Authorization"));
-                                return config;
-                            })
                     );
 
         return httpSecurity.build();
