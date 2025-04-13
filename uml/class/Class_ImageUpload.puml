@@ -1,0 +1,37 @@
+@startuml
+skinparam classAttributeIconSize 0
+hide empty members
+
+class Image {
+    - id : String
+    + constructor()
+    + getter()
+    + setter()
+}
+class ImageRepository {
+    - image : Set<Image>
+    + save(image : Image)
+    + delete(image : Image)
+}
+class ImageService {
+    - imageRepository : ImageRepository
+    + uploadImage(imageFile : MultipartFile)
+    + uploadImageWithScaling(imageFile : MultipartFile, int : width, int : height)
+    + deleteImageById(imageId : String)
+    - getImageType(String : imageName)
+    - resizeImage(BufferedImage : originalImage, int : targetWidth, int : targetHeight)
+}
+class ImageController {
+    - imageService : ImageService
+    + POST /api/images() <<secured>>
+    + POST /api/images/scaling() <<secured>>
+    + DELETE /api/images() <<secured>>
+}
+
+Image "0..1" --* "1" User
+Image "0..1" --* "1" Recommendation
+ImageRepository --> Image
+ImageService --> ImageRepository
+ImageController --> ImageService
+
+@enduml
