@@ -6,14 +6,12 @@ class Recommendation {
     - id : UUID
     - title : String
     - description : String
-    - url : URI
+    - url : URL
     - imgPath : String
     - creator : User
     - creationDate : LocalDateTime
-    - url : URI
     - rating : Int
     - category : Category
-    - imgPath : String
     - tags : Set<Tag>
     + constructor()
     + getter()
@@ -50,7 +48,7 @@ class RecommendationAssignment {
     - userId : UUID
     - recommendationId : Long
     - recommendationAssignmentStatus : RecommendationAssignmentStatus
-    - receivedAt : LocalDateTime
+    - sentAt : LocalDateTime
     - acceptedAt : LocalDateTime
     + constructor()
     + getter()

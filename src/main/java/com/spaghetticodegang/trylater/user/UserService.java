@@ -111,7 +111,7 @@ public class UserService implements UserDetailsService {
 
         final User user = User.builder()
                 .userName(userMeRegistrationDto.getUserName())
-                .displayName(userMeRegistrationDto.getDisplayName())
+                .displayName(userMeRegistrationDto.getUserName())
                 .email(userMeRegistrationDto.getEmail())
                 .password(passwordEncoder.encode(userMeRegistrationDto.getPassword()))
                 // TODO: Platzhalterbild einfügen

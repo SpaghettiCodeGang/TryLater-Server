@@ -1,4 +1,4 @@
-package com.spaghetticodegang.trylater.recommendation.taggroup;
+package com.spaghetticodegang.trylater.recommendation.tag.group;
 
 import com.spaghetticodegang.trylater.recommendation.category.Category;
 import org.springframework.data.jpa.repository.JpaRepository;

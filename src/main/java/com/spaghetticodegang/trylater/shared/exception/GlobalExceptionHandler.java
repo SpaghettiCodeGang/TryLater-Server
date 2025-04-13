@@ -66,11 +66,11 @@ public class GlobalExceptionHandler {
      * Handles authentication failures caused by incorrect passwords.
      *
      * @param ex the exception thrown when credentials are invalid
-     * @return a 401 Unauthorized response with a user-friendly error message
+     * @return a 400 Bad Request response with a user-friendly error message
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+        return ResponseEntity.badRequest().body(Map.of(
                 "message", messageUtil.get("auth.invalid.credentials")
         ));
     }
