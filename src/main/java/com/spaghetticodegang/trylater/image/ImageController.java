@@ -1,7 +1,9 @@
 package com.spaghetticodegang.trylater.image;
 
 
+import com.spaghetticodegang.trylater.image.dto.ImageUploadRequestDto;
 import com.spaghetticodegang.trylater.image.dto.ImageUploadResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +29,14 @@ public class ImageController {
      * Upon successful upload, it returns a {@link ResponseEntity} with an
      * {@link ImageUploadResponseDto} in the body and an HTTP status code 201 (CREATED).
      *
-     * @param imageFile The {@link MultipartFile} containing the image to be uploaded.
+     * @param request The {@link ImageUploadRequestDto} containing the image to be uploaded.
      * This parameter is required and must be named "image" in the request.
      * @return A {@link ResponseEntity} containing an {@link ImageUploadResponseDto}
      * with the ID and path of the uploaded image and an HTTP status code 201 (CREATED).
      */
     @PostMapping
-    public ResponseEntity<ImageUploadResponseDto> uploadImage(@RequestParam("image") MultipartFile imageFile) {
-        ImageUploadResponseDto imageUploadResponseDto = imageService.uploadImage(imageFile);
+    public ResponseEntity<ImageUploadResponseDto> uploadImage(@Valid @ModelAttribute ImageUploadRequestDto request) {
+        ImageUploadResponseDto imageUploadResponseDto = imageService.uploadImage(request.getImageFile());
         return ResponseEntity.status(HttpStatus.CREATED).body(imageUploadResponseDto);
     }
 
@@ -74,8 +76,8 @@ public class ImageController {
      * @return A {@link ResponseEntity} with HTTP status code 204 (NO_CONTENT) if the image was
      * successfully deleted, or 404 (NOT_FOUND) if the image with the given ID does not exist.
      */
-    @DeleteMapping
-    public ResponseEntity<Void> deleteImage(@RequestParam("imageId") String id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteImage(@PathVariable("id") String id) {
         boolean isDeleted = imageService.deleteImageById(id);
 
         if (!isDeleted) {

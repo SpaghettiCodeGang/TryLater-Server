@@ -204,10 +204,6 @@ public class ImageService {
      * does not have a supported image file extension.
      */
     private String validateImage(MultipartFile imageFile) {
-        if (imageFile == null || imageFile.isEmpty()) {
-            throw new ImageHandleException(Map.of("image", messageUtil.get("image.is.empty")));
-        }
-
         final String imageType = getImageType(Objects.requireNonNull(imageFile.getOriginalFilename()));
         final Set<String> allowedTypesSet = new HashSet<>(Arrays.asList("png", "jpeg", "jpg", "webp"));
 

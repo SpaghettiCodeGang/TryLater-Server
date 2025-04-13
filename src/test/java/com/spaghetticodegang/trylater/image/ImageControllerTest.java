@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.image;
 
+import com.spaghetticodegang.trylater.image.dto.ImageUploadRequestDto;
 import com.spaghetticodegang.trylater.image.dto.ImageUploadResponseDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,12 @@ public class ImageControllerTest {
     @Test
     void uploadImage_success() {
         MultipartFile mockImageFile = new MockMultipartFile("image", "test.png", "image/png", "some image data".getBytes());
+        ImageUploadRequestDto mockRequestDto = ImageUploadRequestDto.builder()
+                .imageFile(mockImageFile)
+                .build();
+
+        mockRequestDto.setImageFile(mockImageFile);
+
         ImageUploadResponseDto mockResponseDto = ImageUploadResponseDto.builder()
                 .imageId("generatedId")
                 .imagePath("/path/to/generatedId.png")
@@ -33,7 +40,7 @@ public class ImageControllerTest {
 
         when(imageService.uploadImage(mockImageFile)).thenReturn(mockResponseDto);
 
-        ResponseEntity<ImageUploadResponseDto> response = imageController.uploadImage(mockImageFile);
+        ResponseEntity<ImageUploadResponseDto> response = imageController.uploadImage(mockRequestDto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(mockResponseDto, response.getBody());
