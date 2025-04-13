@@ -30,7 +30,7 @@ public class ImageController {
      * {@link ImageUploadResponseDto} in the body and an HTTP status code 201 (CREATED).
      *
      * @param request The {@link ImageUploadRequestDto} containing the image to be uploaded.
-     * This parameter is required and must be named "image" in the request.
+     * This parameter is required and must be named "imageFile" in the request.
      * @return A {@link ResponseEntity} containing an {@link ImageUploadResponseDto}
      * with the ID and path of the uploaded image and an HTTP status code 201 (CREATED).
      */
@@ -48,18 +48,14 @@ public class ImageController {
      * A successful upload and scaling operation results in a {@link ResponseEntity}
      * with an {@link ImageUploadResponseDto} and an HTTP status code 201 (CREATED).
      *
-     * @param imageFile    The {@link MultipartFile} containing the image to be uploaded and scaled.
-     * This parameter is required and must be named "image" in the request.
-     * @param targetWidth  The desired width of the scaled image, provided as a query parameter named "width".
-     * Must be a positive integer.
-     * @param targetHeight The desired height of the scaled image, provided as a query parameter named "height".
-     * Must be a positive integer.
+     * @param request The {@link ImageUploadRequestDto} containing the image to be uploaded.
+     * This parameter is required and must be named "imageFile" in the request.
      * @return A {@link ResponseEntity} containing an {@link ImageUploadResponseDto}
      * with the ID and path of the uploaded and scaled image and an HTTP status code 201 (CREATED).
      */
     @PostMapping("/scaling")
-    public ResponseEntity<ImageUploadResponseDto> uploadImageWithScaling(@RequestParam("image") MultipartFile imageFile, @RequestParam(name = "width") int targetWidth, @RequestParam(name = "height") int targetHeight) {
-        ImageUploadResponseDto imageUploadResponseDto = imageService.uploadImageWithScaling(imageFile, targetWidth, targetHeight);
+    public ResponseEntity<ImageUploadResponseDto> uploadImageWithScaling(@Valid @ModelAttribute ImageUploadRequestDto request) {
+        ImageUploadResponseDto imageUploadResponseDto = imageService.uploadImageWithScaling(request.getImageFile(), request.getTargetWidth(), request.getTargetHeight());
         return ResponseEntity.status(HttpStatus.CREATED).body(imageUploadResponseDto);
     }
 

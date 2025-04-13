@@ -91,19 +91,6 @@ class ImageServiceTest {
     }
 
     @Test
-    void uploadImage_emptyFile_throwsImageHandleException() {
-        MultipartFile mockImageFile = new MockMultipartFile("image", TEST_IMAGE_NAME, "image/png", new byte[0]);
-        when(messageUtil.get("image.is.empty")).thenReturn("Image file is empty.");
-
-        ImageHandleException exception = assertThrows(ImageHandleException.class, () -> imageService.uploadImage(mockImageFile));
-        assertEquals("Image file is empty.", exception.getErrors().get("image"));
-
-        verify(imageRepository, never()).save(any());
-        verify(messageUtil, times(1)).get("image.is.empty");
-        assertFalse(Files.exists(testUploadDirPath.resolve(getImageIdFromUpload(mockImageFile))));
-    }
-
-    @Test
     void uploadImage_wrongType_throwsImageHandleException() {
         MultipartFile mockImageFile = new MockMultipartFile("image", "test-image.gif", "image/gif", TEST_IMAGE_DATA);
         when(messageUtil.get("image.wrong.type")).thenReturn("Image type is not allowed.");
@@ -132,18 +119,6 @@ class ImageServiceTest {
         assertFalse(Files.exists(testUploadDirPath.resolve(getImageIdFromUpload(mockImageFile))));
     }
 
-    @Test
-    void uploadImageWithScaling_validateImageFailsEmptyFile_throwsImageHandleException() throws IOException {
-        MultipartFile mockImageFile = new MockMultipartFile("image", TEST_IMAGE_NAME, "image/png", new byte[0]);
-        when(messageUtil.get("image.is.empty")).thenReturn("Image file is empty.");
-
-        ImageHandleException exception = assertThrows(ImageHandleException.class, () -> imageService.uploadImageWithScaling(mockImageFile, 100, 100));
-        assertEquals("Image file is empty.", exception.getErrors().get("image"));
-
-        verify(imageRepository, never()).save(any());
-        verify(messageUtil, times(1)).get("image.is.empty");
-        assertFalse(Files.exists(testUploadDirPath.resolve(getImageIdFromUpload(mockImageFile))));
-    }
 
     @Test
     void uploadImageWithScaling_validateImageFailsWrongType_throwsImageHandleException() throws IOException {

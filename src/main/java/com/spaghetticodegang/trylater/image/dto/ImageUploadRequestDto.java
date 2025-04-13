@@ -1,6 +1,5 @@
 package com.spaghetticodegang.trylater.image.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class ImageUploadRequestDto {
     @NotNull(message = "{image.no.file}")
-    @NotEmpty(message = "{image.is.empty}")
     private MultipartFile imageFile;
+
+    private Integer targetWidth;
+    private Integer targetHeight;
 }
