@@ -8,7 +8,7 @@ class Image {
     + getter()
     + setter()
 }
-class ImageRepository {
+interface ImageRepository {
     - image : Set<Image>
     + save(image : Image)
     + delete(image : Image)
@@ -16,10 +16,11 @@ class ImageRepository {
 class ImageService {
     - imageRepository : ImageRepository
     + uploadImage(imageFile : MultipartFile)
-    + uploadImageWithScaling(imageFile : MultipartFile, int : width, int : height)
+    + uploadImageWithScaling(imageFile : MultipartFile, int : targetWidth, int : targetHeight)
     + deleteImageById(imageId : String)
     - getImageType(String : imageName)
     - resizeImage(BufferedImage : originalImage, int : targetWidth, int : targetHeight)
+    - validateImage(imageFile : MultipartFile)
 }
 class ImageController {
     - imageService : ImageService
