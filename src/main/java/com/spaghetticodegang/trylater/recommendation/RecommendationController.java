@@ -1,5 +1,7 @@
 package com.spaghetticodegang.trylater.recommendation;
 
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
+import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationResponseDto;
 import com.spaghetticodegang.trylater.user.User;
@@ -8,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller providing endpoints for managing recommendations.
@@ -34,5 +33,11 @@ public class RecommendationController {
     public ResponseEntity<RecommendationResponseDto> createRecommendation(@AuthenticationPrincipal User me, @RequestBody @Valid RecommendationRequestDto request) {
         RecommendationResponseDto recommendationResponseDto = recommendationService.createRecommendation(me, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(recommendationResponseDto);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto recommendationAssignmentStatusRequestDto) {
+        RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, recommendationAssignmentStatusRequestDto);
+        return ResponseEntity.ok(recommendationResponseDto);
     }
 }

@@ -2,12 +2,14 @@ package com.spaghetticodegang.trylater.recommendation;
 
 import com.spaghetticodegang.trylater.contact.ContactService;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
+import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.category.Category;
 import com.spaghetticodegang.trylater.recommendation.category.CategoryRepository;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationResponseDto;
 import com.spaghetticodegang.trylater.recommendation.tag.Tag;
 import com.spaghetticodegang.trylater.recommendation.tag.TagService;
+import com.spaghetticodegang.trylater.shared.exception.RecommendationNotFoundException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.User;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service layer for handling business logic related to recommendations.
@@ -97,6 +100,13 @@ public class RecommendationService {
                 .build();
     }
 
+    public RecommendationResponseDto updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto request){
+        Long recommendationId = recommendationAssignmentService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, request);
+        Recommendation recommendation = getRecommendationById(recommendationId);
+
+        return createRecommendationResponseDto(recommendation);
+    }
+
     /**
      * Validates that a tag with the given ID belongs to the specified category.
      * The category defines the valid TagGroups, and each Tag must belong to a TagGroup of this category.
@@ -126,6 +136,11 @@ public class RecommendationService {
             throw new ValidationException(Map.of("receiver", messageUtil.get("recommendation.receiver.not.valid")));
         }
         return userService.findUserById(receiverId);
+    }
+
+    private Recommendation getRecommendationById(Long recommendationId) {
+        return recommendationRepository.findById(recommendationId)
+                .orElseThrow(() -> new RecommendationNotFoundException("recommendation.not.found"));
     }
 
 }
