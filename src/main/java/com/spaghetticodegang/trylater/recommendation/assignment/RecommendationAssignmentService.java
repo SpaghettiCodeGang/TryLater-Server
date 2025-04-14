@@ -52,7 +52,7 @@ public class RecommendationAssignmentService {
      */
     public Long updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto recommendationAssignmentStatusRequestDto) {
         final RecommendationAssignmentStatus recommendationAssignmentStatus = recommendationAssignmentStatusRequestDto.getRecommendationAssignmentStatus();
-        final RecommendationAssignment recommendationAssignment = findRecommendationAssignmentById(recommendationAssignmentId);
+        final RecommendationAssignment recommendationAssignment = getRecommendationAssignmentById(recommendationAssignmentId);
 
         if (!Objects.equals(recommendationAssignment.getReceiver().getId(), me.getId())) {
             throw new ValidationException(Map.of("recommendationAssignment", messageUtil.get("recommendation.assignment.error.user.not.allowed")));
@@ -79,7 +79,7 @@ public class RecommendationAssignmentService {
      * @return the recommendation assignment entity
      * @throws RecommendationAssignmentNotFoundException if the recommendation assignment is not found
      */
-    private RecommendationAssignment findRecommendationAssignmentById(Long recommendationAssignmentId) {
+    private RecommendationAssignment getRecommendationAssignmentById(Long recommendationAssignmentId) {
         return recommendationAssignmentRepository.findById(recommendationAssignmentId)
                 .orElseThrow(() -> new RecommendationAssignmentNotFoundException("recommendation.assignment.error.not.found"));
 

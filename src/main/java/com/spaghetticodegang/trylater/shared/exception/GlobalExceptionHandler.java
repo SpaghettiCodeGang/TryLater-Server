@@ -103,6 +103,32 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles authentication failures caused by non-existent recommendation.
+     *
+     * @param ex the exception thrown when the recommendation is not found
+     * @return a 404 Not Found response with a user-friendly error message
+     */
+    @ExceptionHandler(RecommendationNotFoundException.class)
+    public ResponseEntity<Object> handleRecommendationNotFound(RecommendationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "message", messageUtil.get(ex.getMessage())
+        ));
+    }
+
+    /**
+     * Handles authentication failures caused by non-existent recommendation assignment.
+     *
+     * @param ex the exception thrown when the recommendation assignment is not found
+     * @return a 404 Not Found response with a user-friendly error message
+     */
+    @ExceptionHandler(RecommendationAssignmentNotFoundException.class)
+    public ResponseEntity<Object> handleRecommendationAssignmentNotFound(RecommendationAssignmentNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "message", messageUtil.get(ex.getMessage())
+        ));
+    }
+
+    /**
      * Handles failures caused by exceeding image size upload limit.
      *
      * @param ex the exception thrown when the image size is too big

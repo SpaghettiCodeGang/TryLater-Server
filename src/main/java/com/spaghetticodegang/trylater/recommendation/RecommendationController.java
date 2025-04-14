@@ -37,14 +37,14 @@ public class RecommendationController {
     /**
      * Handles a recommendation assignment status update request by delegating to the service layer.
      *
-     * @param me                         the currently authenticated user (requester)
-     * @param recommendationAssignmentId the ID of the recommendation assignment to update
-     * @param request                    the recommendation request data
+     * @param me                             the currently authenticated user (requester)
+     * @param recommendationAssignmentId     the ID of the recommendation assignment to update
+     * @param recommendationAssignmentStatus the recommendation assignment status
      * @return the created recommendation as a response DTO
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto request) {
-        RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, request);
+    public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto recommendationAssignmentStatus) {
+        RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, recommendationAssignmentStatus);
         return ResponseEntity.ok(recommendationResponseDto);
     }
 }
