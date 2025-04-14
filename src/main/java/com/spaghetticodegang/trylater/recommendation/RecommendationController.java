@@ -1,6 +1,5 @@
 package com.spaghetticodegang.trylater.recommendation;
 
-import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
 import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationResponseDto;
@@ -25,7 +24,7 @@ public class RecommendationController {
     /**
      * Handles a new recommendation request by delegating to the service layer.
      *
-     * @param me the currently authenticated user (requester)
+     * @param me      the currently authenticated user (requester)
      * @param request the recommendation request data including receiver user IDs
      * @return the created recommendation as a response DTO
      */
@@ -35,9 +34,17 @@ public class RecommendationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(recommendationResponseDto);
     }
 
+    /**
+     * Handles a recommendation assignment status update request by delegating to the service layer.
+     *
+     * @param me                         the currently authenticated user (requester)
+     * @param recommendationAssignmentId the ID of the recommendation assignment to update
+     * @param request                    the recommendation request data
+     * @return the created recommendation as a response DTO
+     */
     @PatchMapping("/{id}")
-    public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto recommendationAssignmentStatusRequestDto) {
-        RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, recommendationAssignmentStatusRequestDto);
+    public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto request) {
+        RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, request);
         return ResponseEntity.ok(recommendationResponseDto);
     }
 }

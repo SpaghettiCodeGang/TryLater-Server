@@ -1,6 +1,7 @@
 package com.spaghetticodegang.trylater.recommendation;
 
 import com.spaghetticodegang.trylater.contact.ContactService;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignment;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
 import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.category.Category;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Service layer for handling business logic related to recommendations.
@@ -41,7 +41,7 @@ public class RecommendationService {
      * Creates a new recommendation and sent it to a list of contacts.
      * Performs validation to prevent invalid categories.
      *
-     * @param me the authenticated user
+     * @param me      the authenticated user
      * @param request the recommendation request containing the receiver IDs
      * @return a response DTO representing the newly created recommendation
      * @throws ValidationException if the category is not found
@@ -100,7 +100,16 @@ public class RecommendationService {
                 .build();
     }
 
-    public RecommendationResponseDto updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto request){
+    /**
+     * Updates the status of a {@link RecommendationAssignment} for the currently authenticated user.
+     *
+     * @param me                         the currently authenticated {@link User}
+     * @param recommendationAssignmentId the ID of the {@link RecommendationAssignment} to update
+     * @param request                    the {@link RecommendationAssignmentStatusRequestDto} containing the new status
+     * @return a response DTO representing the recommendation
+     * @throws RecommendationNotFoundException if there is no recommendation with requested ID
+     */
+    public RecommendationResponseDto updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto request) {
         Long recommendationId = recommendationAssignmentService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, request);
         Recommendation recommendation = getRecommendationById(recommendationId);
 
@@ -112,7 +121,7 @@ public class RecommendationService {
      * The category defines the valid TagGroups, and each Tag must belong to a TagGroup of this category.
      *
      * @param category the preselected category
-     * @param tagId the ID of the tag to validate
+     * @param tagId    the ID of the tag to validate
      * @return the validated {@link Tag} object
      * @throws ValidationException if the tag is not associated with the category
      */
@@ -126,7 +135,7 @@ public class RecommendationService {
     /**
      * Validates that the receiver is a valid contact of the sender.
      *
-     * @param sender the user who sends the recommendation
+     * @param sender     the user who sends the recommendation
      * @param receiverId the ID of the receiver
      * @return the validated {@link User} object
      * @throws ValidationException if the receiver is not a valid contact
@@ -138,6 +147,13 @@ public class RecommendationService {
         return userService.findUserById(receiverId);
     }
 
+    /**
+     * Finds a recommendation by its unique ID
+     *
+     * @param recommendationId the ID of the recommendation
+     * @return the recommendation entity
+     * @throws RecommendationNotFoundException if the recommendation is not found
+     */
     private Recommendation getRecommendationById(Long recommendationId) {
         return recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> new RecommendationNotFoundException("recommendation.not.found"));

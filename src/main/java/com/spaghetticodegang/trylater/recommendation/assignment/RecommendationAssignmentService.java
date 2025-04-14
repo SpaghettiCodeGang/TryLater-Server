@@ -41,12 +41,21 @@ public class RecommendationAssignmentService {
         recommendationAssignmentRepository.save(recommendationAssignment);
     }
 
+    /**
+     * Performs validation and updates the recommendation assignment's status, including setting the acceptance date if applicable.
+     *
+     * @param me the currently authenticated user
+     * @param recommendationAssignmentId the ID of the recommendation assignment whose status is to be updated
+     * @param recommendationAssignmentStatusRequestDto the DTO containing the new recommendation assignment status
+     * @return a response DTO representing the updated recommendation assignment
+     * @throws ValidationException if the status change is invalid
+     */
     public Long updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto recommendationAssignmentStatusRequestDto) {
         final RecommendationAssignmentStatus recommendationAssignmentStatus = recommendationAssignmentStatusRequestDto.getRecommendationAssignmentStatus();
         final RecommendationAssignment recommendationAssignment = findRecommendationAssignmentById(recommendationAssignmentId);
 
         if (!Objects.equals(recommendationAssignment.getReceiver().getId(), me.getId())) {
-            throw new ValidationException(Map.of("recommendationAssignment", messageUtil.get("recommendation.assignment.error.user.not.found")));
+            throw new ValidationException(Map.of("recommendationAssignment", messageUtil.get("recommendation.assignment.error.user.not.allowed")));
         }
 
         if (recommendationAssignmentStatus == RecommendationAssignmentStatus.SENT) {
@@ -63,6 +72,13 @@ public class RecommendationAssignmentService {
         return recommendationAssignment.getId();
     }
 
+    /**
+     * Finds a recommendation by its unique ID
+     *
+     * @param recommendationAssignmentId the ID of the recommendation assignment
+     * @return the recommendation assignment entity
+     * @throws RecommendationAssignmentNotFoundException if the recommendation assignment is not found
+     */
     private RecommendationAssignment findRecommendationAssignmentById(Long recommendationAssignmentId) {
         return recommendationAssignmentRepository.findById(recommendationAssignmentId)
                 .orElseThrow(() -> new RecommendationAssignmentNotFoundException("recommendation.assignment.error.not.found"));
