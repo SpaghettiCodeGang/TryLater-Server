@@ -1,8 +1,6 @@
 package com.spaghetticodegang.trylater.recommendation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spaghetticodegang.trylater.contact.ContactStatus;
-import com.spaghetticodegang.trylater.contact.dto.ContactStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentStatus;
 import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationRequestDto;
@@ -30,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

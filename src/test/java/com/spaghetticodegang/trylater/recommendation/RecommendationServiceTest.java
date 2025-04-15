@@ -59,9 +59,6 @@ class RecommendationServiceTest {
     @InjectMocks
     private RecommendationService recommendationService;
 
-    @InjectMocks
-    private RecommendationController recommendationController;
-
     private User createUser(Long id) {
         return User.builder()
                 .id(id)
