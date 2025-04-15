@@ -79,7 +79,7 @@ public class RecommendationAssignmentService {
      * @return the recommendation assignment entity
      * @throws RecommendationAssignmentNotFoundException if the recommendation assignment is not found
      */
-    private RecommendationAssignment getRecommendationAssignmentById(Long recommendationAssignmentId) {
+    public RecommendationAssignment getRecommendationAssignmentById(Long recommendationAssignmentId) {
         return recommendationAssignmentRepository.findById(recommendationAssignmentId)
                 .orElseThrow(() -> new RecommendationAssignmentNotFoundException("recommendation.assignment.error.not.found"));
 

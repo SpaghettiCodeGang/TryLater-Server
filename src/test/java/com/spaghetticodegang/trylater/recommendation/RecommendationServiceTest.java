@@ -2,6 +2,8 @@ package com.spaghetticodegang.trylater.recommendation;
 
 import com.spaghetticodegang.trylater.contact.ContactService;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentStatus;
+import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.category.Category;
 import com.spaghetticodegang.trylater.recommendation.category.CategoryRepository;
 import com.spaghetticodegang.trylater.recommendation.category.CategoryType;
@@ -10,15 +12,18 @@ import com.spaghetticodegang.trylater.recommendation.dto.RecommendationResponseD
 import com.spaghetticodegang.trylater.recommendation.tag.Tag;
 import com.spaghetticodegang.trylater.recommendation.tag.group.TagGroup;
 import com.spaghetticodegang.trylater.recommendation.tag.TagService;
+import com.spaghetticodegang.trylater.shared.exception.RecommendationNotFoundException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.User;
 import com.spaghetticodegang.trylater.user.UserService;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -53,6 +58,9 @@ class RecommendationServiceTest {
 
     @InjectMocks
     private RecommendationService recommendationService;
+
+    @InjectMocks
+    private RecommendationController recommendationController;
 
     private User createUser(Long id) {
         return User.builder()
@@ -173,4 +181,59 @@ class RecommendationServiceTest {
         assertTrue(ex.getErrors().containsKey("receiver"));
         assertEquals("Der angegebene Empfänger ist kein gültiger Kontakt.", ex.getErrors().get("receiver"));
     }
+
+    @Test
+    void testUpdateRecommendationAssignmentStatus_recommendationNotFound() {
+        User me = new User();
+        Long recommendationAssignmentId = 1L;
+        Long recommendationId = 10L;
+        RecommendationAssignmentStatusRequestDto requestDto = new RecommendationAssignmentStatusRequestDto();
+
+        Mockito.when(recommendationAssignmentService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, requestDto))
+                .thenReturn(recommendationId);
+        Mockito.when(recommendationRepository.findById(recommendationId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(RecommendationNotFoundException.class, () -> {
+            recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, requestDto);
+        });
+    }
+
+    @Test
+    void shouldUpdateRecommendationAssignmentStatusSuccessfully() {
+        User user = createUser(1L);
+        Long recommendationAssignmentId = 100L;
+        Long recommendationId = 200L;
+
+        RecommendationAssignmentStatusRequestDto requestDto = new RecommendationAssignmentStatusRequestDto();
+        requestDto.setRecommendationAssignmentStatus(RecommendationAssignmentStatus.ACCEPTED);
+
+        Recommendation recommendation = Recommendation.builder()
+                .id(recommendationId)
+                .title("Title")
+                .description("Description")
+                .rating(3)
+                .imgPath("path.png")
+                .category(createCategory(CategoryType.MEDIA))
+                .build();
+
+        when(recommendationAssignmentService.updateRecommendationAssignmentStatus(user, recommendationAssignmentId, requestDto))
+                .thenReturn(recommendationId);
+        when(recommendationRepository.findById(recommendationId))
+                .thenReturn(Optional.of(recommendation));
+
+        RecommendationResponseDto response = recommendationService.updateRecommendationAssignmentStatus(user, recommendationAssignmentId, requestDto);
+
+        assertNotNull(response);
+        assertEquals(recommendation.getId(), response.getId());
+        assertEquals(recommendation.getTitle(), response.getTitle());
+        assertEquals(recommendation.getDescription(), response.getDescription());
+        assertEquals(recommendation.getRating(), response.getRating());
+        assertEquals(recommendation.getImgPath(), response.getImgPath());
+        assertEquals(recommendation.getCategory().getCategoryType(), response.getCategory());
+
+        verify(recommendationAssignmentService).updateRecommendationAssignmentStatus(user, recommendationAssignmentId, requestDto);
+        verify(recommendationRepository).findById(recommendationId);
+    }
+
 }
