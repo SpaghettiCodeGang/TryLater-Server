@@ -42,5 +42,3 @@ Die TryLater-Serveranwendung verwaltet die Nutzerdaten und Empfehlungen der TryL
 
 Die Client-Anwendung kommuniziert über `/api/...` mit dem Backend.
 Eine vollständige Übersicht aller verfügbaren Routen, Parameter und Datenformate befindet sich im [TryLater-Server Wiki](https://github.com/SpaghettiCodeGang/TryLater-Server/wiki).
-
-Testerino!
