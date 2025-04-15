@@ -77,4 +77,24 @@ class UserRepositoryTest {
         boolean exists = userRepository.existsByUserName("nonexistent");
         assertThat(exists).isFalse();
     }
+
+    @Test
+    void shouldFindUserBySearchTerm() {
+        User user = User.builder()
+                .userName("searchTest")
+                .displayName("Search Test")
+                .email("search@example.com")
+                .password("secure123")
+                .imgPath("/assets/user.webp")
+                .registrationDate(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+
+        var byUserName = userRepository.findByEmailOrUserName("search@example.com", "search@example.com");
+        var byEmail = userRepository.findByEmailOrUserName("search@example.com", "search@example.com");
+
+        assertThat(byUserName).isPresent();
+        assertThat(byEmail).isPresent();
+        assertThat(byUserName.get().getUserName()).isEqualTo("searchTest");
+    }
 }

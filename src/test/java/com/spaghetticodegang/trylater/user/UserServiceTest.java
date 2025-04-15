@@ -184,4 +184,39 @@ class UserServiceTest {
         assertEquals("/assets/user.webp", result.getImgPath());
     }
 
+    @Test
+    void shouldReturnUserResponseDto_whenSearchTermMatches() {
+        User user = User.builder()
+                .id(1L)
+                .userName("searchTest")
+                .displayName("Search Test")
+                .email("search@example.com")
+                .password("encodedPassword")
+                .imgPath("/assets/user.webp")
+                .registrationDate(LocalDateTime.now())
+                .build();
+
+        when(userRepository.findByEmailOrUserName("searchTest", "searchTest"))
+                .thenReturn(java.util.Optional.of(user));
+
+        var result = userService.searchUser("searchTest");
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("searchTest", result.getUserName());
+        assertEquals("Search Test", result.getDisplayName());
+        assertEquals("/assets/user.webp", result.getImgPath());
+    }
+
+    @Test
+    void shouldThrowException_whenSearchTermDoesNotMatch() {
+        when(userRepository.findByEmailOrUserName("unknown", "unknown"))
+                .thenReturn(java.util.Optional.empty());
+
+        var ex = assertThrows(UsernameNotFoundException.class, () -> {
+            userService.searchUser("unknown");
+        });
+
+        assertEquals("user.not.found", ex.getMessage());
+    }
 }
