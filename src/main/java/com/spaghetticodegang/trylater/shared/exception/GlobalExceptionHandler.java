@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.shared.exception;
 
+import com.spaghetticodegang.trylater.recommendation.category.CategoryType;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,8 +9,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Map;
@@ -128,6 +131,43 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    /**
+     * Handles type mismatch errors in request parameters, e.g. invalid enum values.
+     *
+     * @param ex the exception describing the parameter mismatch
+     * @return a 400 Bad Request response with a specific message for known types
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        if (ex.getRequiredType() == CategoryType.class) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", messageUtil.get("recommendation.tag.category.invalid")
+            ));
+        }
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "message", messageUtil.get("exception.badrequest")
+        ));
+    }
+
+    /**
+     * Handles missing request parameters, especially for required query parameters.
+     *
+     * @param ex the exception describing the missing parameter
+     * @return a 400 Bad Request response with a parameter-specific or general error message
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex) {
+        if ("category".equals(ex.getParameterName())) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", messageUtil.get("recommendation.tag.category.required")
+            ));
+        }
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "message", messageUtil.get("exception.badrequest")
+        ));
+    }
 
     /**
      * Handles uncaught {@link RuntimeException} instances.
