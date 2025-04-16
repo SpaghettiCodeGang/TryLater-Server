@@ -148,7 +148,7 @@ public class ContactService {
      */
     public void deleteContact(User me, Long contactId) {
         final Contact contact = findContactById(contactId);
-        if (!Objects.equals(contact.getRequester().getId(), me.getId()) || !Objects.equals(contact.getReceiver().getId(), me.getId())) {
+        if (!Objects.equals(contact.getRequester().getId(), me.getId()) && !Objects.equals(contact.getReceiver().getId(), me.getId())) {
             throw new ValidationException(Map.of("contact", messageUtil.get("contact.error.user.not.found")));
         }
         contactRepository.deleteById(contactId);

@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -159,5 +160,37 @@ class ContactServiceTest {
         assertEquals(99L, result.getContactId());
         assertEquals(ContactStatus.PENDING, result.getContactStatus());
         assertEquals(contactPartnerDto, result.getContactPartner());
+    }
+
+    @Test
+    void shouldDeleteContactSuccessfully() {
+        User me = createUser(1L);
+        User other = createUser(2L);
+        Contact contact = createContact(me, other);
+
+        when(contactRepository.findById(99L)).thenReturn(Optional.of(contact));
+
+        contactService.deleteContact(me, 99L);
+
+        verify(contactRepository).deleteById(99L);
+    }
+
+    @Test
+    void shouldThrowValidationException_whenUserIsNotInContact() {
+        User me = createUser(1L);
+        User unrelated = createUser(3L);
+        User other = createUser(2L);
+        Contact contact = createContact(unrelated, other);
+
+        when(contactRepository.findById(99L)).thenReturn(Optional.of(contact));
+        when(messageUtil.get("contact.error.user.not.found")).thenReturn("Du bist diesem Kontakt nicht zugeordnet.");
+
+        ValidationException ex = assertThrows(ValidationException.class, () -> {
+            contactService.deleteContact(me, 99L);
+        });
+
+        assertTrue(ex.getErrors().containsKey("contact"));
+        assertEquals("Du bist diesem Kontakt nicht zugeordnet.", ex.getErrors().get("contact"));
+        verify(contactRepository, never()).deleteById(anyLong());
     }
 }
