@@ -23,8 +23,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ContactController.class)
@@ -108,5 +107,11 @@ class ContactControllerTest {
                 .andExpect(jsonPath("$.contactId").value(1L))
                 .andExpect(jsonPath("$.contactPartner.userName").value("partner"))
                 .andExpect(jsonPath("$.contactStatus").value("ACCEPTED"));
+    }
+
+    @Test
+    void shouldReturn204_whenContactDeletedSuccessfully() throws Exception {
+        mockMvc.perform(delete("/api/contact/1"))
+                .andExpect(status().isNoContent());
     }
 }

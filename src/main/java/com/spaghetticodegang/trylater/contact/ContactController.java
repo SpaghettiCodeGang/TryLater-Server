@@ -24,7 +24,7 @@ public class ContactController {
     /**
      * Handles a new contact request by delegating to the service layer.
      *
-     * @param me the currently authenticated user (requester)
+     * @param me      the currently authenticated user (requester)
      * @param request the contact request data including target user ID
      * @return the created contact as a response DTO
      */
@@ -37,14 +37,27 @@ public class ContactController {
     /**
      * Updates the status of a contact by delegating the request to the service layer.
      *
-     * @param me the currently authenticated user
-     * @param contactId the ID of the contact whose status is to be updated
+     * @param me            the currently authenticated user
+     * @param contactId     the ID of the contact whose status is to be updated
      * @param contactStatus the new contact status provided by the user
      * @return the updated contact as a response DTO
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<ContactResponseDto> updateContactStatus(@AuthenticationPrincipal User me,@PathVariable("id") Long contactId, @RequestBody @Valid ContactStatusRequestDto contactStatus) {
+    public ResponseEntity<ContactResponseDto> updateContactStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long contactId, @RequestBody @Valid ContactStatusRequestDto contactStatus) {
         ContactResponseDto contactResponseDto = contactService.updateContactStatus(me, contactId, contactStatus);
         return ResponseEntity.ok(contactResponseDto);
+    }
+
+    /**
+     * Deletes a contact or contact request by delegating the request to the service layer.
+     *
+     * @param me        the currently authenticated user
+     * @param contactId the ID of the contact whose status is to be deleted
+     * @return A {@link ResponseEntity} with HTTP status code 204 (NO_CONTENT)
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteContact(@AuthenticationPrincipal User me, @PathVariable("id") Long contactId) {
+        contactService.deleteContact(me, contactId);
+        return ResponseEntity.noContent().build();
     }
 }
