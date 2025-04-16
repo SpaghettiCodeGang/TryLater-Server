@@ -2,6 +2,7 @@ package com.spaghetticodegang.trylater.user;
 
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
+import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,5 +42,17 @@ public class UserController {
     public ResponseEntity<UserMeResponseDto> registerUser(@RequestBody @Valid UserMeRegistrationDto userMeRegistrationDto) {
         UserMeResponseDto userMeResponseDto = userService.registerUser(userMeRegistrationDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userMeResponseDto);
+    }
+
+    /**
+     * Searches for a user by userName or email.
+     *
+     * @param user for search criteria
+     * @return the matching user`s public information
+     */
+    @GetMapping("/search")
+    public ResponseEntity<UserResponseDto> searchUser(@RequestParam String user) {
+        UserResponseDto userResponseDto = userService.searchUser(user);
+        return ResponseEntity.ok(userResponseDto);
     }
 }

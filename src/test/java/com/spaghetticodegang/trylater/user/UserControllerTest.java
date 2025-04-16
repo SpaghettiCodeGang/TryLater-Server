@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
+import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,26 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.userName").value("tester"))
                 .andExpect(jsonPath("$.displayName").value("Tester"))
                 .andExpect(jsonPath("$.email").value("tester@example.com"))
+                .andExpect(jsonPath("$.imgPath").value("/assets/user.webp"));
+    }
+
+    @Test
+    void shouldReturn200AndUserDto_whenSearchIsSuccessful() throws Exception {
+        var userResponseDto = UserResponseDto.builder()
+                .id(1L)
+                .userName("searchTest")
+                .displayName("Search Test")
+                .imgPath("/assets/user.webp")
+                .build();
+
+        when(userService.searchUser("searchTest")).thenReturn(userResponseDto);
+
+        mockMvc.perform(get("/api/user/search")
+                        .param("user", "searchTest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.userName").value("searchTest"))
+                .andExpect(jsonPath("$.displayName").value("Search Test"))
                 .andExpect(jsonPath("$.imgPath").value("/assets/user.webp"));
     }
 }
