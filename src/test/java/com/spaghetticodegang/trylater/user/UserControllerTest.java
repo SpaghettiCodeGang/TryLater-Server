@@ -5,7 +5,6 @@ import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
-import com.spaghetticodegang.trylater.user.dto.UserSearchDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -118,12 +116,8 @@ class UserControllerTest {
 
         when(userService.searchUser("searchTest")).thenReturn(userResponseDto);
 
-        UserSearchDto searchDto = new UserSearchDto();
-        searchDto.setSearchTerm("searchTest");
-
-        mockMvc.perform(post("/api/user/search")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(searchDto)))
+        mockMvc.perform(get("/api/user/search")
+                        .param("user", "searchTest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.userName").value("searchTest"))

@@ -126,12 +126,12 @@ public class UserService implements UserDetailsService {
     /**
      * searches for user by their userName or email
      *
-     * @param searchTerm the userName or email to search for
+     * @param username the userName or email to search for
      * @return a DTO containing the user's public information
      * @throws UsernameNotFoundException if no matching user is found
      */
-    public UserResponseDto searchUser(String searchTerm) {
-        User user = userRepository.findByEmailOrUserName(searchTerm, searchTerm)
+    public UserResponseDto searchUser(String username) {
+        User user = userRepository.findByEmailOrUserName(username, username)
                 .orElseThrow(() -> new UsernameNotFoundException("user.not.found"));
 
         return createUserResponseDto(user);
