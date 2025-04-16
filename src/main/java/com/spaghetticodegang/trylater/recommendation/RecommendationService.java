@@ -1,13 +1,16 @@
 package com.spaghetticodegang.trylater.recommendation;
 
 import com.spaghetticodegang.trylater.contact.ContactService;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignment;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
+import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.category.Category;
 import com.spaghetticodegang.trylater.recommendation.category.CategoryRepository;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationResponseDto;
 import com.spaghetticodegang.trylater.recommendation.tag.Tag;
 import com.spaghetticodegang.trylater.recommendation.tag.TagService;
+import com.spaghetticodegang.trylater.shared.exception.RecommendationNotFoundException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.User;
@@ -38,7 +41,7 @@ public class RecommendationService {
      * Creates a new recommendation and sent it to a list of contacts.
      * Performs validation to prevent invalid categories.
      *
-     * @param me the authenticated user
+     * @param me      the authenticated user
      * @param request the recommendation request containing the receiver IDs
      * @return a response DTO representing the newly created recommendation
      * @throws ValidationException if the category is not found
@@ -98,11 +101,27 @@ public class RecommendationService {
     }
 
     /**
+     * Updates the status of a {@link RecommendationAssignment} for the currently authenticated user.
+     *
+     * @param me                         the currently authenticated {@link User}
+     * @param recommendationAssignmentId the ID of the {@link RecommendationAssignment} to update
+     * @param request                    the {@link RecommendationAssignmentStatusRequestDto} containing the new status
+     * @return a response DTO representing the recommendation
+     * @throws RecommendationNotFoundException if there is no recommendation with requested ID
+     */
+    public RecommendationResponseDto updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto request) {
+        Long recommendationId = recommendationAssignmentService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, request);
+        Recommendation recommendation = getRecommendationById(recommendationId);
+
+        return createRecommendationResponseDto(recommendation);
+    }
+
+    /**
      * Validates that a tag with the given ID belongs to the specified category.
      * The category defines the valid TagGroups, and each Tag must belong to a TagGroup of this category.
      *
      * @param category the preselected category
-     * @param tagId the ID of the tag to validate
+     * @param tagId    the ID of the tag to validate
      * @return the validated {@link Tag} object
      * @throws ValidationException if the tag is not associated with the category
      */
@@ -116,7 +135,7 @@ public class RecommendationService {
     /**
      * Validates that the receiver is a valid contact of the sender.
      *
-     * @param sender the user who sends the recommendation
+     * @param sender     the user who sends the recommendation
      * @param receiverId the ID of the receiver
      * @return the validated {@link User} object
      * @throws ValidationException if the receiver is not a valid contact
@@ -126,6 +145,18 @@ public class RecommendationService {
             throw new ValidationException(Map.of("receiver", messageUtil.get("recommendation.receiver.not.valid")));
         }
         return userService.findUserById(receiverId);
+    }
+
+    /**
+     * Finds a recommendation by its unique ID
+     *
+     * @param recommendationId the ID of the recommendation
+     * @return the recommendation entity
+     * @throws RecommendationNotFoundException if the recommendation is not found
+     */
+    private Recommendation getRecommendationById(Long recommendationId) {
+        return recommendationRepository.findById(recommendationId)
+                .orElseThrow(() -> new RecommendationNotFoundException("recommendation.not.found"));
     }
 
 }

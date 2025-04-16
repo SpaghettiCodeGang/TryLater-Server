@@ -1,8 +1,12 @@
 package com.spaghetticodegang.trylater.recommendation.tag;
 
+import com.spaghetticodegang.trylater.recommendation.category.Category;
+import com.spaghetticodegang.trylater.recommendation.category.CategoryRepository;
+import com.spaghetticodegang.trylater.recommendation.category.CategoryType;
 import com.spaghetticodegang.trylater.recommendation.tag.dto.TagGroupResponseDto;
 import com.spaghetticodegang.trylater.recommendation.tag.dto.TagResponseDto;
 import com.spaghetticodegang.trylater.recommendation.tag.group.TagGroup;
+import com.spaghetticodegang.trylater.recommendation.tag.group.TagGroupRepository;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import org.junit.jupiter.api.Test;
@@ -22,6 +26,12 @@ class TagServiceTest {
 
     @Mock
     private TagRepository tagRepository;
+
+    @Mock
+    private TagGroupRepository tagGroupRepository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
 
     @Mock
     private MessageUtil messageUtil;
@@ -94,4 +104,34 @@ class TagServiceTest {
         assertEquals(1, epocheGroup.getTags().size());
         assertEquals("Mittel", epocheGroup.getTags().getFirst().getTagName());
     }
+
+    @Test
+    void shouldReturnTagGroupsForValidCategoryType() {
+        // Arrange
+        CategoryType categoryType = CategoryType.MEDIA;
+        Category category = Category.builder().categoryType(categoryType).build();
+
+        Tag tag1 = createTag(1L, "Action", "Genre");
+        Tag tag2 = createTag(2L, "Komödie", "Genre");
+
+        TagGroup tagGroup = TagGroup.builder()
+                .tagGroupName("Genre")
+                .tags(List.of(tag1, tag2))
+                .build();
+
+        tag1.setTagGroup(tagGroup);
+        tag2.setTagGroup(tagGroup);
+
+        when(categoryRepository.findByCategoryType(categoryType)).thenReturn(Optional.of(category));
+        when(tagGroupRepository.findAllByCategory(category)).thenReturn(List.of(tagGroup));
+
+        List<TagGroupResponseDto> result = tagService.getTagsByCategory(categoryType);
+
+        assertEquals(1, result.size());
+        TagGroupResponseDto group = result.getFirst();
+        assertEquals("Genre", group.getTagGroupName());
+        assertEquals(2, group.getTags().size());
+        assertTrue(group.getTags().stream().map(TagResponseDto::getTagName).toList().containsAll(List.of("Action", "Komödie")));
+    }
+
 }
