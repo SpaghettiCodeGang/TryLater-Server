@@ -114,4 +114,59 @@ class ContactControllerTest {
         mockMvc.perform(delete("/api/contact/1"))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void shouldReturn200_whenGetContactById() throws Exception {
+        when(contactService.getContact(any(User.class), any(Long.class)))
+                .thenReturn(createContactResponse(ContactStatus.ACCEPTED));
+
+        mockMvc.perform(get("/api/contact/1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.contactId").value(1L))
+                .andExpect(jsonPath("$.contactPartner.userName").value("partner"))
+                .andExpect(jsonPath("$.contactStatus").value("ACCEPTED"));
+    }
+
+    @Test
+    void shouldReturn200_whenGetAllContactsWithoutStatus() throws Exception {
+        List<ContactResponseDto> contactList = List.of(
+                createContactResponse(ContactStatus.ACCEPTED),
+                createContactResponse(ContactStatus.PENDING)
+        );
+
+        when(contactService.getAllContacts(any(User.class), any()))
+                .thenReturn(contactList);
+
+        mockMvc.perform(get("/api/contact")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].contactStatus").value("ACCEPTED"))
+                .andExpect(jsonPath("$[1].contactStatus").value("PENDING"));
+    }
+
+    @Test
+    void shouldReturn200_whenGetAllContactsWithValidStatus() throws Exception {
+        List<ContactResponseDto> filtered = List.of(createContactResponse(ContactStatus.PENDING));
+
+        when(contactService.getAllContacts(any(User.class), any(ContactStatus.class)))
+                .thenReturn(filtered);
+
+        mockMvc.perform(get("/api/contact")
+                        .param("contactStatus", "PENDING")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].contactStatus").value("PENDING"));
+    }
+
+    @Test
+    void shouldReturn400_whenGetAllContactsWithInvalidStatus() throws Exception {
+        mockMvc.perform(get("/api/contact")
+                        .param("contactStatus", "INVALID_STATUS")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
