@@ -96,7 +96,7 @@ public class ContactService {
      * @throws ValidationException if the status change is invalid
      */
     public ContactResponseDto updateContactStatus(User me, Long contactId, ContactStatusRequestDto contactStatusRequestDto) {
-        final ContactStatus contactStatus= contactStatusRequestDto.getContactStatus();
+        final ContactStatus contactStatus = contactStatusRequestDto.getContactStatus();
         final Contact contact = findContactById(contactId);
 
         if (!Objects.equals(contact.getRequester().getId(), me.getId()) && !Objects.equals(contact.getReceiver().getId(), me.getId())) {
@@ -139,4 +139,18 @@ public class ContactService {
                 .build();
     }
 
+    /**
+     * Deletes a {@link Contact} entity.
+     * Determines which user is the contact partner (not the authenticated user).
+     *
+     * @param me the authenticated user
+     * @param contactId the contact id
+     */
+    public void deleteContact(User me, Long contactId) {
+        final Contact contact = findContactById(contactId);
+        if (!Objects.equals(contact.getRequester().getId(), me.getId()) || !Objects.equals(contact.getReceiver().getId(), me.getId())) {
+            throw new ValidationException(Map.of("contact", messageUtil.get("contact.error.user.not.found")));
+        }
+        contactRepository.deleteById(contactId);
+    }
 }
