@@ -83,6 +83,6 @@ public class ContactController {
      */
     @GetMapping
     public ResponseEntity<List<ContactResponseDto>> getAllContacts(@AuthenticationPrincipal User me, @RequestParam(name = "contactStatus", required = false) ContactStatus contactStatus) {
-        return ResponseEntity.ok(contactService.getAllContacts(me, contactStatus));
+        return ResponseEntity.ok(contactService.getAllContactsForUser(me, contactStatus));
     }
 }

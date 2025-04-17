@@ -181,7 +181,7 @@ public class ContactService {
      * @param me the authenticated user
      * @return a list of response DTO representing the contacts optional filters
      */
-    public List<ContactResponseDto> getAllContacts(User me, ContactStatus contactStatus) {
+    public List<ContactResponseDto> getAllContactsForUser(User me, ContactStatus contactStatus) {
 
         List<Contact> contacts = findContactsByUserId(me.getId(), contactStatus);
 
@@ -198,7 +198,7 @@ public class ContactService {
      * @return a list of the contact entities
      */
     public List<Contact> findContactsByUserId(Long userId, ContactStatus contactStatus) {
-        if (contactStatus != null && !EnumSet.of(ContactStatus.ACCEPTED, ContactStatus.PENDING).contains(contactStatus)) {
+        if (contactStatus != null) {
             return contactRepository.findByUserIdAndContactStatus(userId, contactStatus);
         }
         return contactRepository.findByUserId(userId);

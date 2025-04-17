@@ -27,13 +27,13 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     boolean existsByUserIds(Long userId1, Long userId2);
 
     /**
-     * Finds all contacts for a given requesterId or receiverId.
+     * Finds all contacts excepted BLOCKED for a given requesterId or receiverId.
      *
      * @param userId the ID of the requester
      * @return a list of {@link Contact} entities.
      */
     @Query("""
-            SELECT c FROM Contact c WHERE c.requester.id = :userId OR c.receiver.id = :userId
+            SELECT c FROM Contact c WHERE (c.requester.id = :userId OR c.receiver.id = :userId) AND c.contactStatus <> 'BLOCKED'
             """)
     List<Contact> findByUserId(Long userId);
 
@@ -46,7 +46,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
      * @return a list of {@link Contact} entities.
      */
     @Query("""
-            SELECT c FROM Contact c WHERE (c.requester.id = :userId OR c.receiver.id = :userId) AND c.contactStatus = :contactStatus
+            SELECT c FROM Contact c WHERE (c.requester.id = :userId OR c.receiver.id = :userId) AND c.contactStatus = :contactStatus AND c.contactStatus <> 'BLOCKED'
             """)
     List<Contact> findByUserIdAndContactStatus(Long userId, ContactStatus contactStatus);
 }
