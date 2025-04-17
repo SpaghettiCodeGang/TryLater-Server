@@ -233,58 +233,41 @@ class ContactServiceTest {
     }
 
     @Test
-    void shouldReturnAllContactsWithoutFilter() {
+    void shouldReturnAllContacts_whenContactStatusIsNull() {
         User me = createUser(1L);
         Contact contact1 = createContact(me, createUser(2L));
-        Contact contact2 = createContact(me, createUser(3L));
-        UserResponseDto dto1 = createUserResponse(contact1.getReceiver());
-        UserResponseDto dto2 = createUserResponse(contact2.getReceiver());
+        Contact contact2 = createContact(createUser(3L), me);
+        contact1.setContactStatus(ContactStatus.PENDING);
+        contact2.setContactStatus(ContactStatus.ACCEPTED);
 
         when(contactRepository.findByUserId(1L)).thenReturn(List.of(contact1, contact2));
-        when(userService.createUserResponseDto(contact1.getReceiver())).thenReturn(dto1);
-        when(userService.createUserResponseDto(contact2.getReceiver())).thenReturn(dto2);
+        when(userService.createUserResponseDto(any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            return createUserResponse(user);
+        });
 
-        List<ContactResponseDto> result = contactService.getAllContacts(me, null);
+        List<ContactResponseDto> result = contactService.getAllContactsForUser(me, null);
 
         assertThat(result).hasSize(2);
-        assertThat(result).extracting(ContactResponseDto::getContactStatus)
-                .containsOnly(ContactStatus.PENDING);
+        verify(contactRepository).findByUserId(1L);
+        verify(contactRepository, never()).findByUserIdAndContactStatus(anyLong(), any());
     }
 
     @Test
-    void shouldReturnFilteredContacts_whenValidStatusIsGiven() {
-        User me = createUser(1L);
-        User other = createUser(2L);
-        Contact contact = createContact(me, other);
-        UserResponseDto contactPartnerDto = createUserResponse(other);
+    void shouldFindContactsByUserIdAndStatus_whenStatusIsNotNull() {
+        Long userId = 1L;
+        ContactStatus status = ContactStatus.ACCEPTED;
+        Contact contact1 = createContact(createUser(1L), createUser(2L));
+        contact1.setContactStatus(status);
 
-        when(contactRepository.findByUserIdAndContactStatus(1L, ContactStatus.PENDING))
-                .thenReturn(List.of(contact));
+        when(contactRepository.findByUserIdAndContactStatus(userId, status)).thenReturn(List.of(contact1));
 
-        when(userService.createUserResponseDto(other)).thenReturn(contactPartnerDto);
-
-        List<ContactResponseDto> result = contactService.getAllContacts(me, ContactStatus.PENDING);
-
-        assertEquals(1, result.size());
-        assertEquals(99L, result.getFirst().getContactId());
-        assertEquals(ContactStatus.PENDING, result.getFirst().getContactStatus());
-        assertEquals(contactPartnerDto, result.getFirst().getContactPartner());
-    }
-
-
-    @Test
-    void shouldCallRepositoryWithUnfilteredQuery_whenStatusIsNotAcceptedOrPending() {
-        User me = createUser(1L);
-        Contact contact = createContact(me, createUser(2L));
-        UserResponseDto dto = createUserResponse(contact.getReceiver());
-
-        when(contactRepository.findByUserId(1L)).thenReturn(List.of(contact));
-        when(userService.createUserResponseDto(contact.getReceiver())).thenReturn(dto);
-
-        List<ContactResponseDto> result = contactService.getAllContacts(me, ContactStatus.BLOCKED);
+        List<Contact> result = contactService.findContactsByUserId(userId, status);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getContactStatus()).isEqualTo(ContactStatus.PENDING);
+        assertThat(result.getFirst().getContactStatus()).isEqualTo(status);
+        verify(contactRepository).findByUserIdAndContactStatus(userId, status);
+        verify(contactRepository, never()).findByUserId(userId);
     }
 
 }

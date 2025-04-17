@@ -135,7 +135,7 @@ class ContactControllerTest {
                 createContactResponse(ContactStatus.PENDING)
         );
 
-        when(contactService.getAllContacts(any(User.class), any()))
+        when(contactService.getAllContactsForUser(any(User.class), any()))
                 .thenReturn(contactList);
 
         mockMvc.perform(get("/api/contact")
@@ -150,7 +150,7 @@ class ContactControllerTest {
     void shouldReturn200_whenGetAllContactsWithValidStatus() throws Exception {
         List<ContactResponseDto> filtered = List.of(createContactResponse(ContactStatus.PENDING));
 
-        when(contactService.getAllContacts(any(User.class), any(ContactStatus.class)))
+        when(contactService.getAllContactsForUser(any(User.class), any(ContactStatus.class)))
                 .thenReturn(filtered);
 
         mockMvc.perform(get("/api/contact")
