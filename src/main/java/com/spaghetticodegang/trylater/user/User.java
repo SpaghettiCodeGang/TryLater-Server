@@ -38,7 +38,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
     private String imgPath;
 
     @Column(nullable = false)
