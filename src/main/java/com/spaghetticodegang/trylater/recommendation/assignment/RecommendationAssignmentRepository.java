@@ -1,7 +1,5 @@
 package com.spaghetticodegang.trylater.recommendation.assignment;
 
-import com.spaghetticodegang.trylater.recommendation.Recommendation;
-import com.spaghetticodegang.trylater.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
