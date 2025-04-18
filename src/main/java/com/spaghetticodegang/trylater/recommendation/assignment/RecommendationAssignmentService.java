@@ -93,7 +93,11 @@ public class RecommendationAssignmentService {
         recommendationAssignmentRepository.deleteById(recommendationAssignment.getId());
     }
 
-    private RecommendationAssignment getRecommendationAssignmentByUserIdAndRecommendationId(Long userId, Long recommendationId) {
+    public RecommendationAssignment getRecommendationAssignmentByUserIdAndRecommendationId(Long userId, Long recommendationId) {
         return recommendationAssignmentRepository.findRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationId);
+    }
+
+    public boolean existsRecommendationInRecommendationAssignment(Long recommendationId) {
+        return recommendationAssignmentRepository.existsRecommendationAssignmentByRecommendationId(recommendationId);
     }
 }

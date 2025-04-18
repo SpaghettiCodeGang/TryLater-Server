@@ -161,7 +161,8 @@ public class RecommendationService {
 
     public void deleteRecommendationAssignment(User me, Long recommendationId) {
         recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(me.getId(), recommendationId);
-        // assignmentServce -> check if recomm still exist
-        // maybe delete recomm
+        if (!recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId)) {
+            recommendationRepository.deleteById(recommendationId);
+        }
     }
 }
