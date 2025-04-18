@@ -12,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for handling business logic related to user contacts.
@@ -55,7 +57,7 @@ public class ContactService {
      * Creates a new contact request between the authenticated user and the target user.
      * Performs validation to prevent duplicate or self-referential contacts.
      *
-     * @param me the authenticated user initiating the request
+     * @param me      the authenticated user initiating the request
      * @param request the contact request containing the target user's ID
      * @return a response DTO representing the newly created contact
      * @throws ValidationException if the target is the same as the requester
@@ -89,8 +91,8 @@ public class ContactService {
     /**
      * Performs validation and updates the contact's status, including setting the acceptance date if applicable.
      *
-     * @param me the currently authenticated user
-     * @param contactId the ID of the contact whose status is to be updated
+     * @param me                      the currently authenticated user
+     * @param contactId               the ID of the contact whose status is to be updated
      * @param contactStatusRequestDto the DTO containing the new contact status
      * @return a response DTO representing the updated contact
      * @throws ValidationException if the status change is invalid
@@ -125,7 +127,7 @@ public class ContactService {
      * Creates a response DTO from a {@link Contact} entity.
      * Determines which user is the contact partner (not the authenticated user).
      *
-     * @param me the authenticated user
+     * @param me      the authenticated user
      * @param contact the contact entity
      * @return a response DTO representing the contact
      */
@@ -143,7 +145,7 @@ public class ContactService {
      * Deletes a {@link Contact} entity.
      * Determines which user is the contact partner (not the authenticated user).
      *
-     * @param me the authenticated user
+     * @param me        the authenticated user
      * @param contactId the contact id
      */
     public void deleteContact(User me, Long contactId) {
@@ -152,5 +154,52 @@ public class ContactService {
             throw new ValidationException(Map.of("contact", messageUtil.get("contact.error.user.not.found")));
         }
         contactRepository.deleteById(contactId);
+    }
+
+    /**
+     * Searches the contact repository for a given id.
+     *
+     * @param me        the authenticated user
+     * @param contactId the contact id
+     * @return a response DTO representing the contact
+     * @throws ValidationException if the user is neither the requester nor receiver of the contact
+     */
+    public ContactResponseDto getContact(User me, Long contactId) {
+        final Contact contact = findContactById(contactId);
+
+        if (!Objects.equals(contact.getRequester().getId(), me.getId()) && !Objects.equals(contact.getReceiver().getId(), me.getId())) {
+            throw new ValidationException(Map.of("contact", messageUtil.get("contact.error.user.not.found")));
+        }
+
+        return createContactResponseDto(me, contact);
+    }
+
+    /**
+     * Searches the contact repository for all contact of the user.
+     *
+     * @param me the authenticated user
+     * @return a list of response DTO representing the contacts optional filters
+     */
+    public List<ContactResponseDto> getAllContactsForUser(User me, ContactStatus contactStatus) {
+
+        List<Contact> contacts = findContactsByUserId(me.getId(), contactStatus);
+
+        return contacts.stream()
+                .map(contact -> createContactResponseDto(me, contact))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Finds all contacts by their user.
+     *
+     * @param userId the ID of the user
+     * @param contactStatus the status of the contact
+     * @return a list of the contact entities
+     */
+    public List<Contact> findContactsByUserId(Long userId, ContactStatus contactStatus) {
+        if (contactStatus != null) {
+            return contactRepository.findByUserIdAndContactStatus(userId, contactStatus);
+        }
+        return contactRepository.findByUserId(userId);
     }
 }

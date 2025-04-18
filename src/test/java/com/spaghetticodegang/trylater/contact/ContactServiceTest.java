@@ -15,8 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -193,4 +195,79 @@ class ContactServiceTest {
         assertEquals("Du bist diesem Kontakt nicht zugeordnet.", ex.getErrors().get("contact"));
         verify(contactRepository, never()).deleteById(anyLong());
     }
+
+    @Test
+    void shouldReturnContactById_whenUserIsInvolved() {
+        User me = createUser(1L);
+        User other = createUser(2L);
+        Contact contact = createContact(me, other);
+        UserResponseDto partnerDto = createUserResponse(other);
+
+        when(contactRepository.findById(99L)).thenReturn(Optional.of(contact));
+        when(userService.createUserResponseDto(other)).thenReturn(partnerDto);
+
+        ContactResponseDto result = contactService.getContact(me, 99L);
+
+        assertNotNull(result);
+        assertEquals(99L, result.getContactId());
+        assertEquals(ContactStatus.PENDING, result.getContactStatus());
+        assertEquals(partnerDto, result.getContactPartner());
+    }
+
+    @Test
+    void shouldThrowValidationException_whenUserNotPartOfContact() {
+        User me = createUser(1L);
+        User unrelated = createUser(3L);
+        User other = createUser(2L);
+        Contact contact = createContact(unrelated, other);
+
+        when(contactRepository.findById(99L)).thenReturn(Optional.of(contact));
+        when(messageUtil.get("contact.error.user.not.found")).thenReturn("Du bist diesem Kontakt nicht zugeordnet.");
+
+        ValidationException ex = assertThrows(ValidationException.class, () -> {
+            contactService.getContact(me, 99L);
+        });
+
+        assertTrue(ex.getErrors().containsKey("contact"));
+        assertEquals("Du bist diesem Kontakt nicht zugeordnet.", ex.getErrors().get("contact"));
+    }
+
+    @Test
+    void shouldReturnAllContacts_whenContactStatusIsNull() {
+        User me = createUser(1L);
+        Contact contact1 = createContact(me, createUser(2L));
+        Contact contact2 = createContact(createUser(3L), me);
+        contact1.setContactStatus(ContactStatus.PENDING);
+        contact2.setContactStatus(ContactStatus.ACCEPTED);
+
+        when(contactRepository.findByUserId(1L)).thenReturn(List.of(contact1, contact2));
+        when(userService.createUserResponseDto(any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            return createUserResponse(user);
+        });
+
+        List<ContactResponseDto> result = contactService.getAllContactsForUser(me, null);
+
+        assertThat(result).hasSize(2);
+        verify(contactRepository).findByUserId(1L);
+        verify(contactRepository, never()).findByUserIdAndContactStatus(anyLong(), any());
+    }
+
+    @Test
+    void shouldFindContactsByUserIdAndStatus_whenStatusIsNotNull() {
+        Long userId = 1L;
+        ContactStatus status = ContactStatus.ACCEPTED;
+        Contact contact1 = createContact(createUser(1L), createUser(2L));
+        contact1.setContactStatus(status);
+
+        when(contactRepository.findByUserIdAndContactStatus(userId, status)).thenReturn(List.of(contact1));
+
+        List<Contact> result = contactService.findContactsByUserId(userId, status);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getContactStatus()).isEqualTo(status);
+        verify(contactRepository).findByUserIdAndContactStatus(userId, status);
+        verify(contactRepository, never()).findByUserId(userId);
+    }
+
 }

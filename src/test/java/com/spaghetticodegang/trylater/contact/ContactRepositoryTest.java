@@ -75,4 +75,51 @@ class ContactRepositoryTest {
         boolean exists = contactRepository.existsByUserIds(requester.getId(), receiver.getId());
         assertThat(exists).isFalse();
     }
+
+    @Test
+    void shouldReturnAllContactsByUserId() {
+        Contact contact1 = contactRepository.save(Contact.builder()
+                .requester(requester)
+                .receiver(receiver)
+                .contactStatus(ContactStatus.PENDING)
+                .requestDate(LocalDateTime.now())
+                .build());
+
+        Contact contact2 = contactRepository.save(Contact.builder()
+                .requester(receiver)
+                .receiver(requester)
+                .contactStatus(ContactStatus.ACCEPTED)
+                .requestDate(LocalDateTime.now())
+                .build());
+
+        var result = contactRepository.findByUserId(requester.getId());
+
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(Contact::getContactStatus)
+                .containsExactlyInAnyOrder(ContactStatus.PENDING, ContactStatus.ACCEPTED);
+    }
+
+    @Test
+    void shouldReturnFilteredContactsByUserIdAndStatus() {
+        contactRepository.save(Contact.builder()
+                .requester(requester)
+                .receiver(receiver)
+                .contactStatus(ContactStatus.PENDING)
+                .requestDate(LocalDateTime.now())
+                .build());
+
+        contactRepository.save(Contact.builder()
+                .requester(receiver)
+                .receiver(requester)
+                .contactStatus(ContactStatus.ACCEPTED)
+                .requestDate(LocalDateTime.now())
+                .build());
+
+        var result = contactRepository.findByUserIdAndContactStatus(requester.getId(), ContactStatus.ACCEPTED);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getContactStatus()).isEqualTo(ContactStatus.ACCEPTED);
+        assertThat(result.getFirst().getRequester()).isEqualTo(receiver);
+    }
+
 }
