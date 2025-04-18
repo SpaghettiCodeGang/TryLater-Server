@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.contact;
 
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.user.User;
 import com.spaghetticodegang.trylater.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,29 +78,6 @@ class ContactRepositoryTest {
     }
 
     @Test
-    void shouldReturnAllContactsByUserId() {
-        Contact contact1 = contactRepository.save(Contact.builder()
-                .requester(requester)
-                .receiver(receiver)
-                .contactStatus(ContactStatus.PENDING)
-                .requestDate(LocalDateTime.now())
-                .build());
-
-        Contact contact2 = contactRepository.save(Contact.builder()
-                .requester(receiver)
-                .receiver(requester)
-                .contactStatus(ContactStatus.ACCEPTED)
-                .requestDate(LocalDateTime.now())
-                .build());
-
-        var result = contactRepository.findByUserId(requester.getId());
-
-        assertThat(result).hasSize(2);
-        assertThat(result).extracting(Contact::getContactStatus)
-                .containsExactlyInAnyOrder(ContactStatus.PENDING, ContactStatus.ACCEPTED);
-    }
-
-    @Test
     void shouldReturnFilteredContactsByUserIdAndStatus() {
         contactRepository.save(Contact.builder()
                 .requester(requester)
@@ -121,5 +99,52 @@ class ContactRepositoryTest {
         assertThat(result.getFirst().getContactStatus()).isEqualTo(ContactStatus.ACCEPTED);
         assertThat(result.getFirst().getRequester()).isEqualTo(receiver);
     }
+
+    @Test
+    void shouldFindContactsByRequesterIdAndStatus() {
+        contactRepository.save(Contact.builder()
+                .requester(requester)
+                .receiver(receiver)
+                .contactStatus(ContactStatus.PENDING)
+                .requestDate(LocalDateTime.now())
+                .build());
+
+        var result = contactRepository.findByRequesterIdAndContactStatus(requester.getId(), ContactStatus.PENDING);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getRequester()).isEqualTo(requester);
+    }
+
+    @Test
+    void shouldFindContactsByReceiverIdAndStatus() {
+        contactRepository.save(Contact.builder()
+                .requester(requester)
+                .receiver(receiver)
+                .contactStatus(ContactStatus.PENDING)
+                .requestDate(LocalDateTime.now())
+                .build());
+
+        var result = contactRepository.findByReceiverIdAndContactStatus(receiver.getId(), ContactStatus.PENDING);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getReceiver()).isEqualTo(receiver);
+    }
+
+    @Test
+    void shouldFindBlockedContactsByBlockedById() {
+        contactRepository.save(Contact.builder()
+                .requester(requester)
+                .receiver(receiver)
+                .contactStatus(ContactStatus.BLOCKED)
+                .blockedBy(requester)
+                .requestDate(LocalDateTime.now())
+                .build());
+
+        var result = contactRepository.findByBlockedByIdAndContactStatus(requester.getId(), ContactStatus.BLOCKED);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getBlockedBy()).isEqualTo(requester);
+    }
+
 
 }

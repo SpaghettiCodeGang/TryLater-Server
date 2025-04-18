@@ -114,8 +114,7 @@ public class UserService implements UserDetailsService {
                 .displayName(userMeRegistrationDto.getUserName())
                 .email(userMeRegistrationDto.getEmail())
                 .password(passwordEncoder.encode(userMeRegistrationDto.getPassword()))
-                // TODO: Platzhalterbild einfügen
-                .imgPath("/assets/user.webp")
+                .imgPath(null)
                 .registrationDate(LocalDateTime.now())
                 .build();
 

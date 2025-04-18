@@ -1,6 +1,6 @@
 package com.spaghetticodegang.trylater.contact.dto;
 
-import com.spaghetticodegang.trylater.contact.ContactStatus;
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
 import lombok.Builder;
 import lombok.Getter;

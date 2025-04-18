@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.contact;
 
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,4 +39,8 @@ public class Contact {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ContactStatus contactStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blocked_by_id")
+    private User blockedBy;
 }
