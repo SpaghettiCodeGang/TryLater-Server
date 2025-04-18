@@ -2,7 +2,6 @@ package com.spaghetticodegang.trylater.recommendation.assignment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.http.ResponseEntity;
 
 /**
  * Repository interface for accessing and managing recommendation assignment  entities in the database.
