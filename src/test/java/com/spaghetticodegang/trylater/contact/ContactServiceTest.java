@@ -3,6 +3,8 @@ package com.spaghetticodegang.trylater.contact;
 import com.spaghetticodegang.trylater.contact.dto.ContactRequestDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactResponseDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactStatusRequestDto;
+import com.spaghetticodegang.trylater.contact.enums.ContactRole;
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.User;
@@ -233,41 +235,64 @@ class ContactServiceTest {
     }
 
     @Test
-    void shouldReturnAllContacts_whenContactStatusIsNull() {
+    void shouldReturnPendingContactsAsReceiver() {
         User me = createUser(1L);
-        Contact contact1 = createContact(me, createUser(2L));
-        Contact contact2 = createContact(createUser(3L), me);
-        contact1.setContactStatus(ContactStatus.PENDING);
-        contact2.setContactStatus(ContactStatus.ACCEPTED);
+        Contact contact = createContact(createUser(2L), me);
+        contact.setContactStatus(ContactStatus.PENDING);
 
-        when(contactRepository.findByUserId(1L)).thenReturn(List.of(contact1, contact2));
-        when(userService.createUserResponseDto(any(User.class))).thenAnswer(invocation -> {
-            User user = invocation.getArgument(0);
-            return createUserResponse(user);
-        });
+        when(contactRepository.findByReceiverIdAndContactStatus(me.getId(), ContactStatus.PENDING)).thenReturn(List.of(contact));
+        when(userService.createUserResponseDto(any(User.class))).thenReturn(createUserResponse(contact.getRequester()));
 
-        List<ContactResponseDto> result = contactService.getAllContactsForUser(me, null);
+        List<ContactResponseDto> result = contactService.getAllContactsByStatusAndRole(me, ContactStatus.PENDING, ContactRole.RECEIVER);
 
-        assertThat(result).hasSize(2);
-        verify(contactRepository).findByUserId(1L);
-        verify(contactRepository, never()).findByUserIdAndContactStatus(anyLong(), any());
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getContactStatus()).isEqualTo(ContactStatus.PENDING);
     }
 
     @Test
-    void shouldFindContactsByUserIdAndStatus_whenStatusIsNotNull() {
-        Long userId = 1L;
-        ContactStatus status = ContactStatus.ACCEPTED;
-        Contact contact1 = createContact(createUser(1L), createUser(2L));
-        contact1.setContactStatus(status);
+    void shouldReturnPendingContactsAsRequester() {
+        User me = createUser(1L);
+        Contact contact = createContact(me, createUser(2L));
+        contact.setContactStatus(ContactStatus.PENDING);
 
-        when(contactRepository.findByUserIdAndContactStatus(userId, status)).thenReturn(List.of(contact1));
+        when(contactRepository.findByRequesterIdAndContactStatus(me.getId(), ContactStatus.PENDING)).thenReturn(List.of(contact));
+        when(userService.createUserResponseDto(any(User.class))).thenReturn(createUserResponse(contact.getReceiver()));
 
-        List<Contact> result = contactService.findContactsByUserId(userId, status);
+        List<ContactResponseDto> result = contactService.getAllContactsByStatusAndRole(me, ContactStatus.PENDING, ContactRole.REQUESTER);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getContactStatus()).isEqualTo(status);
-        verify(contactRepository).findByUserIdAndContactStatus(userId, status);
-        verify(contactRepository, never()).findByUserId(userId);
+        assertThat(result.getFirst().getContactStatus()).isEqualTo(ContactStatus.PENDING);
+    }
+
+    @Test
+    void shouldReturnAcceptedContacts() {
+        User me = createUser(1L);
+        Contact contact = createContact(me, createUser(2L));
+        contact.setContactStatus(ContactStatus.ACCEPTED);
+
+        when(contactRepository.findByUserIdAndContactStatus(me.getId(), ContactStatus.ACCEPTED)).thenReturn(List.of(contact));
+        when(userService.createUserResponseDto(any(User.class))).thenReturn(createUserResponse(contact.getReceiver()));
+
+        List<ContactResponseDto> result = contactService.getAllContactsByStatusAndRole(me, ContactStatus.ACCEPTED, null);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getContactStatus()).isEqualTo(ContactStatus.ACCEPTED);
+    }
+
+    @Test
+    void shouldReturnBlockedContacts() {
+        User me = createUser(1L);
+        Contact contact = createContact(me, createUser(2L));
+        contact.setContactStatus(ContactStatus.BLOCKED);
+        contact.setBlockedBy(me);
+
+        when(contactRepository.findByBlockedByIdAndContactStatus(me.getId(), ContactStatus.BLOCKED)).thenReturn(List.of(contact));
+        when(userService.createUserResponseDto(any(User.class))).thenReturn(createUserResponse(contact.getReceiver()));
+
+        List<ContactResponseDto> result = contactService.getAllContactsByStatusAndRole(me, ContactStatus.BLOCKED, null);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().getContactStatus()).isEqualTo(ContactStatus.BLOCKED);
     }
 
 }

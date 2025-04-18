@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.contact;
 
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -27,17 +28,6 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     boolean existsByUserIds(Long userId1, Long userId2);
 
     /**
-     * Finds all contacts excepted BLOCKED for a given requesterId or receiverId.
-     *
-     * @param userId the ID of the requester
-     * @return a list of {@link Contact} entities.
-     */
-    @Query("""
-            SELECT c FROM Contact c WHERE (c.requester.id = :userId OR c.receiver.id = :userId) AND c.contactStatus <> 'BLOCKED'
-            """)
-    List<Contact> findByUserId(Long userId);
-
-    /**
      * Finds all contacts for a given requesterId or receiverId.
      * Filters the contacts according to the given status.
      *
@@ -46,7 +36,37 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
      * @return a list of {@link Contact} entities.
      */
     @Query("""
-            SELECT c FROM Contact c WHERE (c.requester.id = :userId OR c.receiver.id = :userId) AND c.contactStatus = :contactStatus AND c.contactStatus <> 'BLOCKED'
+            SELECT c
+            FROM Contact c
+            WHERE (c.requester.id = :userId OR c.receiver.id = :userId)
+                AND c.contactStatus = :contactStatus
             """)
     List<Contact> findByUserIdAndContactStatus(Long userId, ContactStatus contactStatus);
+
+    /**
+     * Finds all contacts where the given user is the receiver and the contact has the specified status.
+     *
+     * @param receiverId    the ID of the receiver
+     * @param contactStatus the status of the contact
+     * @return a list of {@link Contact} entities
+     */
+    List<Contact> findByReceiverIdAndContactStatus(Long receiverId, ContactStatus contactStatus);
+
+    /**
+     * Finds all contacts where the given user is the requester and the contact has the specified status.
+     *
+     * @param requesterId   the ID of the requester
+     * @param contactStatus the status of the contact
+     * @return a list of {@link Contact} entities
+     */
+    List<Contact> findByRequesterIdAndContactStatus(Long requesterId, ContactStatus contactStatus);
+
+    /**
+     * Finds all blocked contacts where the given user is the one who performed the blocking.
+     *
+     * @param blockedById   the ID of the user who blocked the contact
+     * @param contactStatus the status of the contact (should be BLOCKED)
+     * @return a list of {@link Contact} entities
+     */
+    List<Contact> findByBlockedByIdAndContactStatus(Long blockedById, ContactStatus contactStatus);
 }

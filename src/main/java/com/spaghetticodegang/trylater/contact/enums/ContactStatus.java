@@ -1,4 +1,4 @@
-package com.spaghetticodegang.trylater.contact;
+package com.spaghetticodegang.trylater.contact.enums;
 
 public enum ContactStatus {
     PENDING,

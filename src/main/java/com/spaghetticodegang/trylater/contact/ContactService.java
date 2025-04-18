@@ -3,6 +3,8 @@ package com.spaghetticodegang.trylater.contact;
 import com.spaghetticodegang.trylater.contact.dto.ContactRequestDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactResponseDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactStatusRequestDto;
+import com.spaghetticodegang.trylater.contact.enums.ContactRole;
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.shared.exception.ContactNotFoundException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
@@ -51,6 +53,68 @@ public class ContactService {
         return contactRepository.findById(contactId)
                 .orElseThrow(() -> new ContactNotFoundException("contact.error.not.found"));
 
+    }
+
+    /**
+     * Creates a response DTO from a {@link Contact} entity.
+     * Determines which user is the contact partner (not the authenticated user).
+     *
+     * @param me      the authenticated user
+     * @param contact the contact entity
+     * @return a response DTO representing the contact
+     */
+    public ContactResponseDto createContactResponseDto(User me, Contact contact) {
+        User contactPartner = contact.getRequester() == me ? contact.getReceiver() : contact.getRequester();
+
+        return ContactResponseDto.builder()
+                .contactId(contact.getId())
+                .contactPartner(userService.createUserResponseDto(contactPartner))
+                .contactStatus(contact.getContactStatus())
+                .build();
+    }
+
+    /**
+     * Searches the contact repository for a given id.
+     *
+     * @param me        the authenticated user
+     * @param contactId the contact id
+     * @return a response DTO representing the contact
+     * @throws ValidationException if the user is neither the requester nor receiver of the contact
+     */
+    public ContactResponseDto getContact(User me, Long contactId) {
+        final Contact contact = findContactById(contactId);
+
+        if (!Objects.equals(contact.getRequester().getId(), me.getId()) && !Objects.equals(contact.getReceiver().getId(), me.getId())) {
+            throw new ValidationException(Map.of("contact", messageUtil.get("contact.error.user.not.found")));
+        }
+
+        return createContactResponseDto(me, contact);
+    }
+
+    /**
+     * Searches the contact repository for all contact of the user.
+     *
+     * @param me the authenticated user
+     * @return a list of response DTO representing the contacts optional filters
+     */
+    public List<ContactResponseDto> getAllContactsByStatusAndRole(User me, ContactStatus contactStatus, ContactRole contactRole) {
+        List<Contact> contacts = List.of();
+
+        if (contactStatus == ContactStatus.PENDING) {
+            if (contactRole.equals(ContactRole.RECEIVER)) {
+                contacts = contactRepository.findByReceiverIdAndContactStatus(me.getId(), ContactStatus.PENDING);
+            } else if (contactRole.equals(ContactRole.REQUESTER)) {
+                contacts = contactRepository.findByRequesterIdAndContactStatus(me.getId(), ContactStatus.PENDING);
+            }
+        } else if (contactStatus == ContactStatus.ACCEPTED) {
+            contacts = contactRepository.findByUserIdAndContactStatus(me.getId(), ContactStatus.ACCEPTED);
+        } else if (contactStatus == ContactStatus.BLOCKED) {
+            contacts = contactRepository.findByBlockedByIdAndContactStatus(me.getId(), ContactStatus.BLOCKED);
+        }
+
+        return contacts.stream()
+                .map(contact -> createContactResponseDto(me, contact))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -117,28 +181,14 @@ public class ContactService {
             contact.setAcceptDate(LocalDateTime.now());
         }
 
+        if (contactStatus == ContactStatus.BLOCKED) {
+            contact.setBlockedBy(me);
+        }
+
         contact.setContactStatus(contactStatus);
         contactRepository.save(contact);
 
         return createContactResponseDto(me, contact);
-    }
-
-    /**
-     * Creates a response DTO from a {@link Contact} entity.
-     * Determines which user is the contact partner (not the authenticated user).
-     *
-     * @param me      the authenticated user
-     * @param contact the contact entity
-     * @return a response DTO representing the contact
-     */
-    public ContactResponseDto createContactResponseDto(User me, Contact contact) {
-        User contactPartner = contact.getRequester() == me ? contact.getReceiver() : contact.getRequester();
-
-        return ContactResponseDto.builder()
-                .contactId(contact.getId())
-                .contactPartner(userService.createUserResponseDto(contactPartner))
-                .contactStatus(contact.getContactStatus())
-                .build();
     }
 
     /**
@@ -156,50 +206,4 @@ public class ContactService {
         contactRepository.deleteById(contactId);
     }
 
-    /**
-     * Searches the contact repository for a given id.
-     *
-     * @param me        the authenticated user
-     * @param contactId the contact id
-     * @return a response DTO representing the contact
-     * @throws ValidationException if the user is neither the requester nor receiver of the contact
-     */
-    public ContactResponseDto getContact(User me, Long contactId) {
-        final Contact contact = findContactById(contactId);
-
-        if (!Objects.equals(contact.getRequester().getId(), me.getId()) && !Objects.equals(contact.getReceiver().getId(), me.getId())) {
-            throw new ValidationException(Map.of("contact", messageUtil.get("contact.error.user.not.found")));
-        }
-
-        return createContactResponseDto(me, contact);
-    }
-
-    /**
-     * Searches the contact repository for all contact of the user.
-     *
-     * @param me the authenticated user
-     * @return a list of response DTO representing the contacts optional filters
-     */
-    public List<ContactResponseDto> getAllContactsForUser(User me, ContactStatus contactStatus) {
-
-        List<Contact> contacts = findContactsByUserId(me.getId(), contactStatus);
-
-        return contacts.stream()
-                .map(contact -> createContactResponseDto(me, contact))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Finds all contacts by their user.
-     *
-     * @param userId the ID of the user
-     * @param contactStatus the status of the contact
-     * @return a list of the contact entities
-     */
-    public List<Contact> findContactsByUserId(Long userId, ContactStatus contactStatus) {
-        if (contactStatus != null) {
-            return contactRepository.findByUserIdAndContactStatus(userId, contactStatus);
-        }
-        return contactRepository.findByUserId(userId);
-    }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spaghetticodegang.trylater.contact.dto.ContactRequestDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactResponseDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactStatusRequestDto;
+import com.spaghetticodegang.trylater.contact.enums.ContactRole;
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.User;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
@@ -21,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -129,37 +131,36 @@ class ContactControllerTest {
     }
 
     @Test
-    void shouldReturn200_whenGetAllContactsWithoutStatus() throws Exception {
-        List<ContactResponseDto> contactList = List.of(
-                createContactResponse(ContactStatus.ACCEPTED),
-                createContactResponse(ContactStatus.PENDING)
-        );
-
-        when(contactService.getAllContactsForUser(any(User.class), any()))
-                .thenReturn(contactList);
-
-        mockMvc.perform(get("/api/contact")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].contactStatus").value("ACCEPTED"))
-                .andExpect(jsonPath("$[1].contactStatus").value("PENDING"));
-    }
-
-    @Test
-    void shouldReturn200_whenGetAllContactsWithValidStatus() throws Exception {
+    void shouldReturn200_whenGetAllContactsWithValidStatusAndRole() throws Exception {
         List<ContactResponseDto> filtered = List.of(createContactResponse(ContactStatus.PENDING));
 
-        when(contactService.getAllContactsForUser(any(User.class), any(ContactStatus.class)))
+        when(contactService.getAllContactsByStatusAndRole(any(User.class), eq(ContactStatus.PENDING), eq(ContactRole.RECEIVER)))
                 .thenReturn(filtered);
 
         mockMvc.perform(get("/api/contact")
-                        .param("contactStatus", "PENDING")
+                        .param("status", "PENDING")
+                        .param("role", "RECEIVER")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].contactStatus").value("PENDING"));
     }
+
+    @Test
+    void shouldReturn200_whenGetAllAcceptedContacts() throws Exception {
+        List<ContactResponseDto> contacts = List.of(createContactResponse(ContactStatus.ACCEPTED));
+
+        when(contactService.getAllContactsByStatusAndRole(any(User.class), eq(ContactStatus.ACCEPTED), isNull()))
+                .thenReturn(contacts);
+
+        mockMvc.perform(get("/api/contact")
+                        .param("status", "ACCEPTED")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].contactStatus").value("ACCEPTED"));
+    }
+
 
     @Test
     void shouldReturn400_whenGetAllContactsWithInvalidStatus() throws Exception {

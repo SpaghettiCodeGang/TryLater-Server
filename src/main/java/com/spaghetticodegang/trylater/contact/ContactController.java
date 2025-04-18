@@ -3,6 +3,8 @@ package com.spaghetticodegang.trylater.contact;
 import com.spaghetticodegang.trylater.contact.dto.ContactRequestDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactResponseDto;
 import com.spaghetticodegang.trylater.contact.dto.ContactStatusRequestDto;
+import com.spaghetticodegang.trylater.contact.enums.ContactRole;
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,34 @@ import java.util.List;
 public class ContactController {
 
     private final ContactService contactService;
+
+    /**
+     * Returns all contact or contact request for a user by delegating the request to the service layer.
+     *
+     * @param me            the currently authenticated user
+     * @param contactStatus the contact status provided by the user
+     * @param contactRole   the requester/receiver role provided by the user
+     * @return the created contact as a response DTO
+     */
+    @GetMapping
+    public ResponseEntity<List<ContactResponseDto>> getAllContactsByStatusAndRole(
+            @AuthenticationPrincipal User me,
+            @RequestParam(name = "status") ContactStatus contactStatus,
+            @RequestParam(name = "role", required = false) ContactRole contactRole) {
+        return ResponseEntity.ok(contactService.getAllContactsByStatusAndRole(me, contactStatus, contactRole));
+    }
+
+    /**
+     * Returns a contact or contact request by delegating the request to the service layer.
+     *
+     * @param me        the currently authenticated user
+     * @param contactId the ID of the contact whose is requested
+     * @return the created contact as a response DTO
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ContactResponseDto> getContactById(@AuthenticationPrincipal User me, @PathVariable("id") Long contactId) {
+        return ResponseEntity.ok(contactService.getContact(me, contactId));
+    }
 
     /**
      * Handles a new contact request by delegating to the service layer.
@@ -63,26 +93,4 @@ public class ContactController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Returns a contact or contact request by delegating the request to the service layer.
-     *
-     * @param me        the currently authenticated user
-     * @param contactId the ID of the contact whose is requested
-     * @return the created contact as a response DTO
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<ContactResponseDto> getContactById(@AuthenticationPrincipal User me, @PathVariable("id") Long contactId) {
-        return ResponseEntity.ok(contactService.getContact(me, contactId));
-    }
-
-    /**
-     * Returns all contact or contact request for a user by delegating the request to the service layer.
-     *
-     * @param me the currently authenticated user
-     * @return the created contact as a response DTO
-     */
-    @GetMapping
-    public ResponseEntity<List<ContactResponseDto>> getAllContacts(@AuthenticationPrincipal User me, @RequestParam(name = "contactStatus", required = false) ContactStatus contactStatus) {
-        return ResponseEntity.ok(contactService.getAllContactsForUser(me, contactStatus));
-    }
 }
