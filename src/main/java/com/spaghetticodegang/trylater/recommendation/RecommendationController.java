@@ -48,6 +48,13 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendationResponseDto);
     }
 
+    /**
+     * Deletes a recommendation assignment by delegating to the service layer.
+     *
+     * @param me                             the currently authenticated user (requester)
+     * @param recommendationId     the ID of the recommendation that assignment should delete
+     * @return A {@link ResponseEntity} with HTTP status code 204 (NO_CONTENT)
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecommendationAssignment(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationId) {
         recommendationService.deleteRecommendationAssignment(me, recommendationId);
