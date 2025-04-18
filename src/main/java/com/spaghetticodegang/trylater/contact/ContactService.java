@@ -64,7 +64,7 @@ public class ContactService {
      * @return a response DTO representing the contact
      */
     public ContactResponseDto createContactResponseDto(User me, Contact contact) {
-        User contactPartner = contact.getRequester() == me ? contact.getReceiver() : contact.getRequester();
+        User contactPartner = contact.getRequester().getId().equals(me.getId()) ? contact.getReceiver() : contact.getRequester();
 
         return ContactResponseDto.builder()
                 .contactId(contact.getId())
