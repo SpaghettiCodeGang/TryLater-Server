@@ -47,4 +47,10 @@ public class RecommendationController {
         RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, recommendationAssignmentStatus);
         return ResponseEntity.ok(recommendationResponseDto);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRecommendationAssignment(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationId) {
+        recommendationService.deleteRecommendationAssignment(me, recommendationId);
+        return ResponseEntity.noContent().build();
+    }
 }

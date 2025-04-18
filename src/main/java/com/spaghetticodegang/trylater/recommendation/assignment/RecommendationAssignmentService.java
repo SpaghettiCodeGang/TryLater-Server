@@ -44,8 +44,8 @@ public class RecommendationAssignmentService {
     /**
      * Performs validation and updates the recommendation assignment's status, including setting the acceptance date if applicable.
      *
-     * @param me the currently authenticated user
-     * @param recommendationAssignmentId the ID of the recommendation assignment whose status is to be updated
+     * @param me                                       the currently authenticated user
+     * @param recommendationAssignmentId               the ID of the recommendation assignment whose status is to be updated
      * @param recommendationAssignmentStatusRequestDto the DTO containing the new recommendation assignment status
      * @return a response DTO representing the updated recommendation assignment
      * @throws ValidationException if the status change is invalid
@@ -83,5 +83,17 @@ public class RecommendationAssignmentService {
         return recommendationAssignmentRepository.findById(recommendationAssignmentId)
                 .orElseThrow(() -> new RecommendationAssignmentNotFoundException("recommendation.assignment.error.not.found"));
 
+    }
+
+    public void deleteRecommendationAssignmentByRecommendationId(Long userId, Long recommendationId) {
+        RecommendationAssignment recommendationAssignment = getRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationId);
+        if (recommendationAssignment == null) {
+            throw new RecommendationAssignmentNotFoundException("recommendation.assignment.error.not.found");
+        }
+        recommendationAssignmentRepository.deleteById(recommendationAssignment.getId());
+    }
+
+    private RecommendationAssignment getRecommendationAssignmentByUserIdAndRecommendationId(Long userId, Long recommendationId) {
+        return recommendationAssignmentRepository.findRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationId);
     }
 }

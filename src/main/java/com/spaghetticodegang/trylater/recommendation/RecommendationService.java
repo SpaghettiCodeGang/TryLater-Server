@@ -159,4 +159,9 @@ public class RecommendationService {
                 .orElseThrow(() -> new RecommendationNotFoundException("recommendation.not.found"));
     }
 
+    public void deleteRecommendationAssignment(User me, Long recommendationId) {
+        recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(me.getId(), recommendationId);
+        // assignmentServce -> check if recomm still exist
+        // maybe delete recomm
+    }
 }
