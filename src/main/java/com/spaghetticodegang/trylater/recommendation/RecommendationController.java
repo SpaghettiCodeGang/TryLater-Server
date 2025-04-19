@@ -45,7 +45,7 @@ public class RecommendationController {
      * @param recommendationAssignmentStatus the recommendation assignment status
      * @return the created recommendation as a response DTO
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/assignment/{id}")
     public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto recommendationAssignmentStatus) {
         RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, recommendationAssignmentStatus);
         return ResponseEntity.ok(recommendationResponseDto);
@@ -58,7 +58,7 @@ public class RecommendationController {
      * @param recommendationAssignmentStatus the status of the assignment
      * @return a list of all the assigned recommendation with that specified status
      */
-    @GetMapping
+    @GetMapping("/assignment")
     public ResponseEntity<List<RecommendationResponseDto>> getAllRecommendations(@AuthenticationPrincipal User me, @RequestParam(name = "status", required = false) RecommendationAssignmentStatus recommendationAssignmentStatus) {
         return ResponseEntity.ok(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(me, recommendationAssignmentStatus));
     }
