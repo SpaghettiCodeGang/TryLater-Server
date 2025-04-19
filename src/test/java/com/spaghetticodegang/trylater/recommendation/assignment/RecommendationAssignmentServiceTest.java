@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -167,6 +168,47 @@ class RecommendationAssignmentServiceTest {
         assertNotNull(savedAssignment.getAcceptedAt());
 
         verify(recommendationAssignmentRepository).findById(recommendationAssignmentId);
+    }
+
+    @Test
+    void shouldReturnRecommendationsByUserAndStatus() {
+        User user = User.builder().id(1L).build();
+        RecommendationAssignmentStatus status = RecommendationAssignmentStatus.ACCEPTED;
+
+        Recommendation recommendation = Recommendation.builder()
+                .id(42L)
+                .title("Test Recommendation")
+                .build();
+
+        when(recommendationAssignmentRepository.findRecommendationsByUserIdAndRecommendationAssignmentStatus(user.getId(), status))
+                .thenReturn(List.of(recommendation));
+
+        List<Recommendation> result = recommendationAssignmentService.getAllRecommendationsByUserAndAssignmentStatus(user, status);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(recommendation.getId(), result.getFirst().getId());
+        assertEquals("Test Recommendation", result.getFirst().getTitle());
+
+        verify(recommendationAssignmentRepository, times(1))
+                .findRecommendationsByUserIdAndRecommendationAssignmentStatus(user.getId(), status);
+    }
+
+    @Test
+    void shouldReturnEmptyListIfNoRecommendationsFound() {
+        User user = User.builder().id(99L).build();
+        RecommendationAssignmentStatus status = RecommendationAssignmentStatus.SENT;
+
+        when(recommendationAssignmentRepository.findRecommendationsByUserIdAndRecommendationAssignmentStatus(user.getId(), status))
+                .thenReturn(List.of());
+
+        List<Recommendation> result = recommendationAssignmentService.getAllRecommendationsByUserAndAssignmentStatus(user, status);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(recommendationAssignmentRepository, times(1))
+                .findRecommendationsByUserIdAndRecommendationAssignmentStatus(user.getId(), status);
     }
 
 }
