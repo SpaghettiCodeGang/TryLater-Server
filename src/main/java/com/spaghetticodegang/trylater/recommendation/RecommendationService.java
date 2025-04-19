@@ -1,9 +1,6 @@
 package com.spaghetticodegang.trylater.recommendation;
 
-import com.spaghetticodegang.trylater.contact.Contact;
 import com.spaghetticodegang.trylater.contact.ContactService;
-import com.spaghetticodegang.trylater.contact.enums.ContactRole;
-import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignment;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentStatus;
