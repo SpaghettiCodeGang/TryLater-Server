@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -83,5 +84,9 @@ public class RecommendationAssignmentService {
         return recommendationAssignmentRepository.findById(recommendationAssignmentId)
                 .orElseThrow(() -> new RecommendationAssignmentNotFoundException("recommendation.assignment.error.not.found"));
 
+    }
+
+    public List<Recommendation> getAllRecommendationsByUserAndAssignmentStatus(User user, RecommendationAssignmentStatus recommendationAssignmentStatus) {
+        return recommendationAssignmentRepository.findRecommendationsByUserIdAndRecommendationAssignmentStatus(user.getId(), recommendationAssignmentStatus);
     }
 }

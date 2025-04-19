@@ -1,8 +1,12 @@
 package com.spaghetticodegang.trylater.recommendation;
 
+import com.spaghetticodegang.trylater.contact.Contact;
 import com.spaghetticodegang.trylater.contact.ContactService;
+import com.spaghetticodegang.trylater.contact.enums.ContactRole;
+import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignment;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentStatus;
 import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.category.Category;
 import com.spaghetticodegang.trylater.recommendation.category.CategoryRepository;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for handling business logic related to recommendations.
@@ -159,4 +164,11 @@ public class RecommendationService {
                 .orElseThrow(() -> new RecommendationNotFoundException("recommendation.not.found"));
     }
 
+    public List<RecommendationResponseDto> getAllRecommendationsByUserAndRecommendationStatus(User me, RecommendationAssignmentStatus recommendationAssignmentStatus) {
+        List<Recommendation> recommendations = recommendationAssignmentService.getAllRecommendationsByUserAndAssignmentStatus(me, recommendationAssignmentStatus);
+
+        return recommendations.stream()
+                .map(this::createRecommendationResponseDto)
+                .collect(Collectors.toList());
+    }
 }

@@ -1,15 +1,19 @@
 package com.spaghetticodegang.trylater.recommendation;
 
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentStatus;
 import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationRequestDto;
 import com.spaghetticodegang.trylater.recommendation.dto.RecommendationResponseDto;
 import com.spaghetticodegang.trylater.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * REST controller providing endpoints for managing recommendations.
@@ -46,5 +50,10 @@ public class RecommendationController {
     public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto recommendationAssignmentStatus) {
         RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, recommendationAssignmentStatus);
         return ResponseEntity.ok(recommendationResponseDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<RecommendationResponseDto>> getAllRecommendations(@AuthenticationPrincipal User me, @RequestParam(name = "status", required = false) RecommendationAssignmentStatus recommendationAssignmentStatus) {
+        return ResponseEntity.ok(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(me, recommendationAssignmentStatus));
     }
 }
