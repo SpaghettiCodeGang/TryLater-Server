@@ -161,6 +161,12 @@ public class RecommendationService {
                 .orElseThrow(() -> new RecommendationNotFoundException("recommendation.not.found"));
     }
 
+    /**
+     * Lists all assigned recommendation with a specific status for a given user.
+     * @param me the currently authenticated user
+     * @param recommendationAssignmentStatus status of the assigment
+     * @return a list of response DTOs representing the recommendations
+     */
     public List<RecommendationResponseDto> getAllRecommendationsByUserAndRecommendationStatus(User me, RecommendationAssignmentStatus recommendationAssignmentStatus) {
         List<Recommendation> recommendations = recommendationAssignmentService.getAllRecommendationsByUserAndAssignmentStatus(me, recommendationAssignmentStatus);
 

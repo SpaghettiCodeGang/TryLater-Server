@@ -86,7 +86,14 @@ public class RecommendationAssignmentService {
 
     }
 
-    public List<Recommendation> getAllRecommendationsByUserAndAssignmentStatus(User user, RecommendationAssignmentStatus recommendationAssignmentStatus) {
-        return recommendationAssignmentRepository.findRecommendationsByUserIdAndRecommendationAssignmentStatus(user.getId(), recommendationAssignmentStatus);
+    /**
+     * Delegates the get request from the recommendation service to the assignment repository for a given user and assignment status.
+     *
+     * @param me the currently authenticated user
+     * @param recommendationAssignmentStatus the given status for the assigned recommendations
+     * @return a list with recommendation entities or an empty list
+     */
+    public List<Recommendation> getAllRecommendationsByUserAndAssignmentStatus(User me, RecommendationAssignmentStatus recommendationAssignmentStatus) {
+        return recommendationAssignmentRepository.findRecommendationsByUserIdAndRecommendationAssignmentStatus(me.getId(), recommendationAssignmentStatus);
     }
 }

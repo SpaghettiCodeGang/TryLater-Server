@@ -51,6 +51,13 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendationResponseDto);
     }
 
+    /**
+     * Handles request to get all assigned recommendations by delegating to the service layer.
+     *
+     * @param me the currently authenticated user (requester)
+     * @param recommendationAssignmentStatus the status of the assignment
+     * @return a list of all the assigned recommendation with that specified status
+     */
     @GetMapping
     public ResponseEntity<List<RecommendationResponseDto>> getAllRecommendations(@AuthenticationPrincipal User me, @RequestParam(name = "status", required = false) RecommendationAssignmentStatus recommendationAssignmentStatus) {
         return ResponseEntity.ok(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(me, recommendationAssignmentStatus));
