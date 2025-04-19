@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -83,5 +84,16 @@ public class RecommendationAssignmentService {
         return recommendationAssignmentRepository.findById(recommendationAssignmentId)
                 .orElseThrow(() -> new RecommendationAssignmentNotFoundException("recommendation.assignment.error.not.found"));
 
+    }
+
+    /**
+     * Delegates the get request from the recommendation service to the assignment repository for a given user and assignment status.
+     *
+     * @param me the currently authenticated user
+     * @param recommendationAssignmentStatus the given status for the assigned recommendations
+     * @return a list with recommendation entities or an empty list
+     */
+    public List<Recommendation> getAllRecommendationsByUserAndAssignmentStatus(User me, RecommendationAssignmentStatus recommendationAssignmentStatus) {
+        return recommendationAssignmentRepository.findRecommendationsByUserIdAndRecommendationAssignmentStatus(me.getId(), recommendationAssignmentStatus);
     }
 }

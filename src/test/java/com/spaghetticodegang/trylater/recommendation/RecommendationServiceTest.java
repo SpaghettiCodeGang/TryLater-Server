@@ -233,4 +233,39 @@ class RecommendationServiceTest {
         verify(recommendationRepository).findById(recommendationId);
     }
 
+    @Test
+    void shouldReturnRecommendationsFilteredByStatus() {
+        User user = createUser(1L);
+        RecommendationAssignmentStatus status = RecommendationAssignmentStatus.ACCEPTED;
+
+        Recommendation recommendation = Recommendation.builder()
+                .id(1L)
+                .title("Test Recommendation")
+                .description("Some description")
+                .rating(4)
+                .imgPath("/img/test.png")
+                .category(createCategory(CategoryType.MEDIA))
+                .build();
+
+        List<Recommendation> mockRecommendations = List.of(recommendation);
+
+        when(recommendationAssignmentService.getAllRecommendationsByUserAndAssignmentStatus(user, status))
+                .thenReturn(mockRecommendations);
+
+        List<RecommendationResponseDto> responseList =
+                recommendationService.getAllRecommendationsByUserAndRecommendationStatus(user, status);
+
+        assertNotNull(responseList);
+        assertEquals(1, responseList.size());
+        RecommendationResponseDto responseDto = responseList.get(0);
+        assertEquals(recommendation.getId(), responseDto.getId());
+        assertEquals(recommendation.getTitle(), responseDto.getTitle());
+        assertEquals(recommendation.getDescription(), responseDto.getDescription());
+        assertEquals(recommendation.getRating(), responseDto.getRating());
+        assertEquals(recommendation.getImgPath(), responseDto.getImgPath());
+        assertEquals(recommendation.getCategory().getCategoryType(), responseDto.getCategory());
+
+        verify(recommendationAssignmentService).getAllRecommendationsByUserAndAssignmentStatus(user, status);
+    }
+
 }

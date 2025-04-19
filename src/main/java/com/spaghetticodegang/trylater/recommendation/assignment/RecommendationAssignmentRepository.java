@@ -1,8 +1,25 @@
 package com.spaghetticodegang.trylater.recommendation.assignment;
 
+import com.spaghetticodegang.trylater.recommendation.Recommendation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 /**
  * Repository interface for accessing and managing recommendation assignment  entities in the database.
  */
-public interface RecommendationAssignmentRepository extends JpaRepository<RecommendationAssignment, Long> {}
+public interface RecommendationAssignmentRepository extends JpaRepository<RecommendationAssignment, Long> {
+
+    /**
+     * Finds all assigned recommendations for a given user with a specific status.
+     *
+     * @param id the user ID
+     * @param recommendationAssignmentStatus the assignment status
+     * @return a list of recommendation entities or an empty list
+     */
+    @Query("""
+            SELECT r.recommendation FROM RecommendationAssignment r WHERE r.receiver.id = :id AND r.recommendationAssignmentStatus = :recommendationAssignmentStatus
+            """)
+    List<Recommendation> findRecommendationsByUserIdAndRecommendationAssignmentStatus(Long id, RecommendationAssignmentStatus recommendationAssignmentStatus);
+}
