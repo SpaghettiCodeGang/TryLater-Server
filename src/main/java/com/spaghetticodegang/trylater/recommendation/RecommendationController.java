@@ -55,7 +55,7 @@ public class RecommendationController {
      * @param recommendationId     the ID of the recommendation that assignment should delete
      * @return A {@link ResponseEntity} with HTTP status code 204 (NO_CONTENT)
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/assignment/{id}")
     public ResponseEntity<Void> deleteRecommendationAssignment(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationId) {
         recommendationService.deleteRecommendationAssignment(me, recommendationId);
         return ResponseEntity.noContent().build();
