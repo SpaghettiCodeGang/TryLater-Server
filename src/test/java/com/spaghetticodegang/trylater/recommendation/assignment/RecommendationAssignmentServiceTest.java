@@ -33,6 +33,7 @@ class RecommendationAssignmentServiceTest {
     private MessageUtil messageUtil;
 
     private final Long recommendationAssignmentId = 123L;
+    private final Long recommendationId = 436L;
     private final Long userId = 456L;
     private User authenticatedUser;
     private RecommendationAssignment existingAssignment;
@@ -167,6 +168,82 @@ class RecommendationAssignmentServiceTest {
         assertNotNull(savedAssignment.getAcceptedAt());
 
         verify(recommendationAssignmentRepository).findById(recommendationAssignmentId);
+    }
+
+    @Test
+    void getRecommendationAssignmentByUserIdAndRecommendationId_assignmentFound() {
+        when(recommendationAssignmentRepository.findRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationAssignmentId))
+                .thenReturn(existingAssignment);
+
+        RecommendationAssignment foundAssignment = recommendationAssignmentService.getRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationAssignmentId);
+
+        assertEquals(existingAssignment, foundAssignment);
+        verify(recommendationAssignmentRepository, times(1))
+                .findRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationAssignmentId);
+    }
+
+    @Test
+    void deleteRecommendationAssignmentByRecommendationId_assignmentNotFound_throwsException() {
+        when(recommendationAssignmentService.getRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationId))
+                .thenReturn(null);
+
+        RecommendationAssignmentNotFoundException exception = assertThrows(RecommendationAssignmentNotFoundException.class, () ->
+                recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(userId, recommendationId)
+        );
+
+        assertEquals("recommendation.assignment.error.not.found", exception.getMessage());
+
+        verify(recommendationAssignmentRepository, never())
+                .deleteById(any());
+    }
+
+    @Test
+    void deleteRecommendationAssignmentByRecommendationId_success() {
+        when(recommendationAssignmentRepository.findRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationAssignmentId))
+                .thenReturn(existingAssignment);
+
+        recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(userId, recommendationAssignmentId);
+
+        verify(recommendationAssignmentRepository, times(1)).deleteById(existingAssignment.getId());
+    }
+
+    @Test
+    void deleteRecommendationAssignmentByRecommendationId_notFound_throwsException() {
+        when(recommendationAssignmentRepository.findRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationAssignmentId))
+                .thenReturn(null);
+
+        RecommendationAssignmentNotFoundException exception = assertThrows(RecommendationAssignmentNotFoundException.class, () ->
+                recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(userId, recommendationAssignmentId)
+        );
+
+        assertEquals("recommendation.assignment.error.not.found", exception.getMessage());
+        verify(recommendationAssignmentRepository, times(1))
+                .findRecommendationAssignmentByUserIdAndRecommendationId(userId, recommendationAssignmentId);
+        verify(recommendationAssignmentRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void existsRecommendationInRecommendationAssignment_exists() {
+        when(recommendationAssignmentRepository.existsRecommendationAssignmentByRecommendationId(recommendationAssignmentId))
+                .thenReturn(true);
+
+        boolean exists = recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationAssignmentId);
+
+        assertTrue(exists);
+        verify(recommendationAssignmentRepository, times(1))
+                .existsRecommendationAssignmentByRecommendationId(recommendationAssignmentId);
+    }
+
+    @Test
+    void existsRecommendationInRecommendationAssignment_doesNotExist() {
+        when(recommendationAssignmentRepository.existsRecommendationAssignmentByRecommendationId(recommendationAssignmentId))
+                .thenReturn(false);
+
+        boolean exists = recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationAssignmentId);
+
+        assertFalse(exists);
+        verify(recommendationAssignmentRepository, times(1))
+                .existsRecommendationAssignmentByRecommendationId(recommendationAssignmentId);
     }
 
 }
