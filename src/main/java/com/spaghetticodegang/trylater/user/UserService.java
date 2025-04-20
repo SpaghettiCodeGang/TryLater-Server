@@ -6,7 +6,6 @@ import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
