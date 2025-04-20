@@ -184,7 +184,7 @@ class UserServiceTest {
         assertEquals("tester", result.getUserName());
         assertEquals("tester", result.getDisplayName());
         assertEquals("test@example.com", result.getEmail());
-        assertEquals(null, result.getImgPath());
+        assertNull(result.getImgPath());
     }
 
     @Test
