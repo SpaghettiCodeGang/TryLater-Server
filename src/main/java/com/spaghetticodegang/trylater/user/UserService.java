@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.user;
 
+import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
@@ -148,10 +149,10 @@ public class UserService implements UserDetailsService {
 
         if (isSensitiveChange) {
             if (userMeUpdateDto.getCurrentPassword() == null) {
-                errors.put("user", messageUtil.get("user.password.notblank"));
+                throw new PasswordErrorException("update.password.notblank");
             }
             if (!passwordEncoder.matches(userMeUpdateDto.getCurrentPassword(), me.getPassword())) {
-                errors.put("auth", messageUtil.get("auth.invalid.password"));
+                throw new UsernameNotFoundException("auth.invalid.credentials");
             }
         }
 
