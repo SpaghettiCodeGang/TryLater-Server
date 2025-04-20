@@ -152,7 +152,7 @@ public class UserService implements UserDetailsService {
                 throw new PasswordErrorException("update.password.notblank");
             }
             if (!passwordEncoder.matches(userMeUpdateDto.getCurrentPassword(), me.getPassword())) {
-                throw new UsernameNotFoundException("auth.invalid.credentials");
+                throw new PasswordErrorException("auth.invalid.password");
             }
         }
 
