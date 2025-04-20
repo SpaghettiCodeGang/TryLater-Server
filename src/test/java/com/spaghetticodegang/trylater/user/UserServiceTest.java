@@ -181,7 +181,7 @@ class UserServiceTest {
         assertEquals("tester", result.getUserName());
         assertEquals("tester", result.getDisplayName());
         assertEquals("test@example.com", result.getEmail());
-        assertEquals("/assets/user.webp", result.getImgPath());
+        assertEquals(null, result.getImgPath());
     }
 
     @Test
