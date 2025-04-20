@@ -138,6 +138,16 @@ public class UserService implements UserDetailsService {
         return createUserResponseDto(user);
     }
 
+    /**
+     * Updates the user profile with the new given entries.
+     * Authentication required for username, email and new password.
+     *
+     * @param me user entity that profile should be updated
+     * @param userMeUpdateDto request dto with the new data
+     * @return a full response DTO for the currently authenticated user
+     * @throws PasswordErrorException if password input for authentication is incorrect
+     * @throws ValidationException if username or email already exists
+     */
     public UserMeResponseDto updateUserProfile(User me, UserMeUpdateDto userMeUpdateDto) {
         final Map<String, String> errors = new HashMap<>();
 

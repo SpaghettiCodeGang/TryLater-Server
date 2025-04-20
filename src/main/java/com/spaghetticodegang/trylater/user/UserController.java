@@ -57,6 +57,13 @@ public class UserController {
         return ResponseEntity.ok(userResponseDto);
     }
 
+    /**
+     * Handles the user profile update request by delegating to the service layer.
+     *
+     * @param me the currently authenticated user (injected by Spring Security)
+     * @param userMeUpdateDto the updated data provided by the user
+     * @return the updated user's public information
+     */
     @PatchMapping("/me")
     public ResponseEntity<UserMeResponseDto> updateUserProfile(@AuthenticationPrincipal User me, @RequestBody @Valid UserMeUpdateDto userMeUpdateDto) {
         UserMeResponseDto userMeResponseDto = userService.updateUserProfile(me, userMeUpdateDto);
