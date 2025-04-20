@@ -148,10 +148,10 @@ public class UserService implements UserDetailsService {
 
         if (isSensitiveChange) {
             if (userMeUpdateDto.getCurrentPassword() == null) {
-                errors.put("password", messageUtil.get("user.password.notblank"));
+                errors.put("user", messageUtil.get("user.password.notblank"));
             }
             if (!passwordEncoder.matches(userMeUpdateDto.getCurrentPassword(), me.getPassword())) {
-                errors.put("password", messageUtil.get("auth.invalid.password"));
+                errors.put("auth", messageUtil.get("auth.invalid.password"));
             }
         }
 
