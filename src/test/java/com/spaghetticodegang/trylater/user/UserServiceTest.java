@@ -1,8 +1,11 @@
 package com.spaghetticodegang.trylater.user;
 
+import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
+import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
+import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,7 +18,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -219,4 +222,142 @@ class UserServiceTest {
 
         assertEquals("user.not.found", ex.getMessage());
     }
+
+    @Test
+    void shouldUpdateUserProfileSuccessfully_whenValidChangesProvided() {
+        User user = User.builder()
+                .id(1L)
+                .userName("tester")
+                .email("test@example.com")
+                .password("encodedCurrentPass")
+                .build();
+
+        UserMeUpdateDto dto = new UserMeUpdateDto();
+        dto.setUserName("newTester");
+        dto.setEmail("new@example.com");
+        dto.setCurrentPassword("currentPass123");
+        dto.setNewPassword("newPass456");
+
+        when(passwordEncoder.matches("currentPass123", "encodedCurrentPass")).thenReturn(true);
+        when(userRepository.existsByUserName("newTester")).thenReturn(false);
+        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("newPass456")).thenReturn("encodedNewPass");
+        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UserMeResponseDto response = userService.updateUserProfile(user, dto);
+
+        assertEquals("newTester", user.getUserName());
+        assertEquals("new@example.com", user.getEmail());
+        assertEquals("encodedNewPass", user.getPassword());
+
+        assertEquals("newTester", response.getUserName());
+    }
+
+    @Test
+    void shouldThrowPasswordErrorException_whenSensitiveChangeWithoutCurrentPassword() {
+        User user = User.builder()
+                .userName("tester")
+                .email("test@example.com")
+                .build();
+
+        UserMeUpdateDto dto = new UserMeUpdateDto();
+        dto.setUserName("changed");
+
+        var ex = assertThrows(PasswordErrorException.class, () -> {
+            userService.updateUserProfile(user, dto);
+        });
+
+        assertEquals("update.password.notblank", ex.getMessage());
+    }
+
+    @Test
+    void shouldThrowPasswordErrorException_whenCurrentPasswordIsIncorrect() {
+        User user = User.builder()
+                .userName("tester")
+                .email("test@example.com")
+                .password("encodedPass")
+                .build();
+
+        UserMeUpdateDto dto = new UserMeUpdateDto();
+        dto.setEmail("new@example.com");
+        dto.setCurrentPassword("wrongPassword");
+
+        when(passwordEncoder.matches("wrongPassword", "encodedPass")).thenReturn(false);
+
+        var ex = assertThrows(PasswordErrorException.class, () -> {
+            userService.updateUserProfile(user, dto);
+        });
+
+        assertEquals("auth.invalid.password", ex.getMessage());
+    }
+
+    @Test
+    void shouldThrowValidationException_whenUsernameOrEmailExists() {
+        User user = User.builder()
+                .userName("tester")
+                .email("test@example.com")
+                .password("encodedPass")
+                .build();
+
+        UserMeUpdateDto dto = new UserMeUpdateDto();
+        dto.setUserName("existingUser");
+        dto.setEmail("existing@example.com");
+        dto.setCurrentPassword("correctPassword");
+
+        when(passwordEncoder.matches("correctPassword", "encodedPass")).thenReturn(true);
+        when(userRepository.existsByUserName("existingUser")).thenReturn(true);
+        when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
+        when(messageUtil.get("user.username.exists")).thenReturn("Benutzername existiert bereits.");
+        when(messageUtil.get("user.email.exists")).thenReturn("E-Mail existiert bereits.");
+
+        var ex = assertThrows(ValidationException.class, () -> {
+            userService.updateUserProfile(user, dto);
+        });
+
+        assertTrue(ex.getErrors().containsKey("userName"));
+        assertTrue(ex.getErrors().containsKey("email"));
+        assertEquals("Benutzername existiert bereits.", ex.getErrors().get("userName"));
+        assertEquals("E-Mail existiert bereits.", ex.getErrors().get("email"));
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldUpdateProfileWithoutPassword_whenOnlyDisplayNameChanges() {
+        User user = User.builder()
+                .userName("tester")
+                .email("test@example.com")
+                .password("encodedPass")
+                .build();
+
+        UserMeUpdateDto dto = new UserMeUpdateDto();
+        dto.setDisplayName("Cooler Name");
+
+        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UserMeResponseDto response = userService.updateUserProfile(user, dto);
+
+        assertEquals("Cooler Name", user.getDisplayName());
+        assertEquals("Cooler Name", response.getDisplayName());
+    }
+
+    @Test
+    void shouldUpdateProfileWithoutPassword_whenOnlyImgPathChanges() {
+        User user = User.builder()
+                .userName("tester")
+                .email("test@example.com")
+                .password("encodedPass")
+                .build();
+
+        UserMeUpdateDto dto = new UserMeUpdateDto();
+        dto.setImgPath("/assets/cool.webp");
+
+        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UserMeResponseDto response = userService.updateUserProfile(user, dto);
+
+        assertEquals("/assets/cool.webp", user.getImgPath());
+        assertEquals("/assets/cool.webp", response.getImgPath());
+    }
+
 }
