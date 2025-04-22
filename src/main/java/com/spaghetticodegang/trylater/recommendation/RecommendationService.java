@@ -173,6 +173,8 @@ public class RecommendationService {
         return recommendations.stream()
                 .map(this::createRecommendationResponseDto)
                 .collect(Collectors.toList());
+    }
+
     /**
      * Deletes a recommendation assignment from given user and recommendation ID.
      * Deletes a recommendation at all if there is no recommendation assignment for that recommendation.

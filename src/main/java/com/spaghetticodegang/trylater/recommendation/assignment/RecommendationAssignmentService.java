@@ -95,6 +95,7 @@ public class RecommendationAssignmentService {
      */
     public List<Recommendation> getAllRecommendationsByUserAndAssignmentStatus(User me, RecommendationAssignmentStatus recommendationAssignmentStatus) {
         return recommendationAssignmentRepository.findRecommendationsByUserIdAndRecommendationAssignmentStatus(me.getId(), recommendationAssignmentStatus);
+    }
 
     /**
      * Deletes a recommendation assignment by its user ID and recommendation ID.

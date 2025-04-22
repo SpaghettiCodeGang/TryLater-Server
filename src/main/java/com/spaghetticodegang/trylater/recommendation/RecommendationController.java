@@ -61,7 +61,8 @@ public class RecommendationController {
     @GetMapping("/assignment")
     public ResponseEntity<List<RecommendationResponseDto>> getAllRecommendations(@AuthenticationPrincipal User me, @RequestParam(name = "status", required = false) RecommendationAssignmentStatus recommendationAssignmentStatus) {
         return ResponseEntity.ok(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(me, recommendationAssignmentStatus));
-      
+    }
+
      /**
      * Deletes a recommendation assignment by delegating to the service layer.
      *
