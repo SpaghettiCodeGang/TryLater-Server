@@ -210,6 +210,7 @@ class RecommendationAssignmentServiceTest {
 
         verify(recommendationAssignmentRepository, times(1))
                 .findRecommendationsByUserIdAndRecommendationAssignmentStatus(user.getId(), status);
+    }
     
     @Test
     void getRecommendationAssignmentByUserIdAndRecommendationId_assignmentFound() {

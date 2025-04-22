@@ -188,6 +188,7 @@ class RecommendationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(1))
                 .andExpect(jsonPath("$[0].title").value("recommendation"));
+    }
     
     @Test  
     void shouldReturn204_whenRecommendationAssignmentDeletedSuccessfully() throws Exception {
