@@ -1,6 +1,7 @@
 package com.spaghetticodegang.trylater.recommendation;
 
 import com.spaghetticodegang.trylater.contact.ContactService;
+import com.spaghetticodegang.trylater.image.ImageService;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentStatus;
 import com.spaghetticodegang.trylater.recommendation.assignment.dto.RecommendationAssignmentStatusRequestDto;
@@ -52,6 +53,9 @@ class RecommendationServiceTest {
 
     @Mock
     private ContactService contactService;
+
+    @Mock
+    private ImageService imageService;
 
     @Mock
     private MessageUtil messageUtil;
@@ -284,15 +288,51 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void deleteRecommendationAssignment_recommendationNoLongerExists_deletesRecommendation() {
+    void deleteRecommendationAssignment_recommendationNoLongerExists_deletesRecommendationWithImage() {
+        Long recommendationId = 42L;
         User user = createUser(1L);
+
+        Recommendation recommendation = new Recommendation();
+        recommendation.setId(recommendationId);
+        recommendation.setImgPath("some/image/path.jpg");
+
         when(recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId))
                 .thenReturn(false);
+        when(recommendationRepository.findById(recommendationId))
+                .thenReturn(Optional.of(recommendation));
 
         recommendationService.deleteRecommendationAssignment(user, recommendationId);
 
-        verify(recommendationAssignmentService).deleteRecommendationAssignmentByRecommendationId(user.getId(), recommendationId);
-        verify(recommendationAssignmentService).existsRecommendationInRecommendationAssignment(recommendationId);
+        verify(recommendationAssignmentService)
+                .deleteRecommendationAssignmentByRecommendationId(user.getId(), recommendationId);
+        verify(recommendationAssignmentService)
+                .existsRecommendationInRecommendationAssignment(recommendationId);
+        verify(recommendationRepository).findById(recommendationId);
+        verify(recommendationRepository).deleteById(recommendationId);
+        verify(imageService).deleteImageById("some/image/path.jpg");
+    }
+
+    @Test
+    void deleteRecommendationAssignment_recommendationNoLongerExists_deletesRecommendationWithoutAnImage() {
+        Long recommendationId = 42L;
+        User user = createUser(1L);
+
+        Recommendation recommendation = new Recommendation();
+        recommendation.setId(recommendationId);
+        recommendation.setImgPath(null);
+
+        when(recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId))
+                .thenReturn(false);
+        when(recommendationRepository.findById(recommendationId))
+                .thenReturn(Optional.of(recommendation));
+
+        recommendationService.deleteRecommendationAssignment(user, recommendationId);
+
+        verify(recommendationAssignmentService)
+                .deleteRecommendationAssignmentByRecommendationId(user.getId(), recommendationId);
+        verify(recommendationAssignmentService)
+                .existsRecommendationInRecommendationAssignment(recommendationId);
+        verify(recommendationRepository).findById(recommendationId);
         verify(recommendationRepository).deleteById(recommendationId);
     }
 }
