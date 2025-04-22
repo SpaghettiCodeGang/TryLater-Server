@@ -14,7 +14,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,9 +37,6 @@ class ImageServiceTest {
 
     @Mock
     private MessageUtil messageUtil;
-
-    @Captor
-    private ArgumentCaptor<Image> imageArgumentCaptor;
 
     private final String TEST_UPLOAD_DIR = "test-upload/";
     private final String TEST_IMAGE_NAME = "test-image.png";
