@@ -139,7 +139,7 @@ class ImageServiceTest {
     }
 
     @Test
-    void deleteImageById_shouldThrowException_whenIOExceptionOccurs() throws IOException {
+    void deleteImageById_shouldThrowException_whenIOExceptionOccurs(){
         String imageId = "test-image.jpg";
         Path filePath = Paths.get(TEST_UPLOAD_DIR, imageId);
 
@@ -149,8 +149,8 @@ class ImageServiceTest {
             filesMockedStatic.when(() -> Files.exists(filePath)).thenReturn(true);
             filesMockedStatic.when(() -> Files.deleteIfExists(filePath))
                     .thenThrow(new IOException("Access denied."));
-            
-            ImageHandleException exception = assertThrows(ImageHandleException.class, () -> {
+
+            assertThrows(ImageHandleException.class, () -> {
                 imageService.deleteImageById(imageId);
             });
         }

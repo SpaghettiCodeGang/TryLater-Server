@@ -3,7 +3,6 @@ package com.spaghetticodegang.trylater.image;
 import com.spaghetticodegang.trylater.shared.exception.ImageHandleException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.image.dto.ImageUploadResponseDto;
-import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
