@@ -11,6 +11,5 @@ import lombok.Setter;
 public class ImageUploadResponseDto {
 
     private String imageId;
-    private String imagePath;
 
 }

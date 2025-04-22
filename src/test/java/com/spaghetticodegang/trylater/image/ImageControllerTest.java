@@ -35,7 +35,6 @@ public class ImageControllerTest {
 
         ImageUploadResponseDto mockResponseDto = ImageUploadResponseDto.builder()
                 .imageId("generatedId")
-                .imagePath("/path/to/generatedId.png")
                 .build();
 
         when(imageService.uploadImage(mockImageFile)).thenReturn(mockResponseDto);
@@ -45,34 +44,6 @@ public class ImageControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(mockResponseDto, response.getBody());
         verify(imageService, times(1)).uploadImage(mockImageFile);
-    }
-
-    @Test
-    void uploadImageWithScaling_success() {
-        MultipartFile mockImageFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "other image data".getBytes());
-        int targetWidth = 100;
-        int targetHeight = 100;
-
-        ImageUploadRequestDto mockRequestDto = ImageUploadRequestDto.builder()
-                .imageFile(mockImageFile)
-                .build();
-
-        mockRequestDto.setImageFile(mockImageFile);
-        mockRequestDto.setTargetWidth(targetWidth);
-        mockRequestDto.setTargetHeight(targetHeight);
-
-        ImageUploadResponseDto mockResponseDto = ImageUploadResponseDto.builder()
-                .imageId("scaledId")
-                .imagePath("/path/to/scaledId_scaled.jpg")
-                .build();
-
-        when(imageService.uploadImageWithScaling(mockImageFile, targetWidth, targetHeight)).thenReturn(mockResponseDto);
-
-        ResponseEntity<ImageUploadResponseDto> response = imageController.uploadImageWithScaling(mockRequestDto);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(mockResponseDto, response.getBody());
-        verify(imageService, times(1)).uploadImageWithScaling(mockImageFile, targetWidth, targetHeight);
     }
 
     @Test

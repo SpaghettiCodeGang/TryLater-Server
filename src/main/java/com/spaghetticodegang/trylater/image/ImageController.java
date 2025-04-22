@@ -41,25 +41,6 @@ public class ImageController {
     }
 
     /**
-     * Handles the upload and scaling of an image file.
-     * This endpoint accepts a multipart file named "image" along with the desired
-     * target width and height as query parameters. It delegates the processing
-     * to the {@link ImageService#uploadImageWithScaling(MultipartFile, int, int)} method.
-     * A successful upload and scaling operation results in a {@link ResponseEntity}
-     * with an {@link ImageUploadResponseDto} and an HTTP status code 201 (CREATED).
-     *
-     * @param request The {@link ImageUploadRequestDto} containing the image to be uploaded.
-     * This parameter is required and must be named "imageFile" in the request.
-     * @return A {@link ResponseEntity} containing an {@link ImageUploadResponseDto}
-     * with the ID and path of the uploaded and scaled image and an HTTP status code 201 (CREATED).
-     */
-    @PostMapping("/scaling")
-    public ResponseEntity<ImageUploadResponseDto> uploadImageWithScaling(@Valid @ModelAttribute ImageUploadRequestDto request) {
-        ImageUploadResponseDto imageUploadResponseDto = imageService.uploadImageWithScaling(request.getImageFile(), request.getTargetWidth(), request.getTargetHeight());
-        return ResponseEntity.status(HttpStatus.CREATED).body(imageUploadResponseDto);
-    }
-
-    /**
      * Handles the deletion of an image based on its unique ID.
      * This endpoint accepts the image ID as a query parameter named "imageId"
      * and delegates the deletion process to the {@link ImageService#deleteImageById(String)} method.

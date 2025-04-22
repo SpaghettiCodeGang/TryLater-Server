@@ -12,7 +12,4 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageUploadRequestDto {
     @NotNull(message = "{image.no.file}")
     private MultipartFile imageFile;
-
-    private Integer targetWidth;
-    private Integer targetHeight;
 }
