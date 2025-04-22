@@ -59,6 +59,8 @@ class RecommendationServiceTest {
     @InjectMocks
     private RecommendationService recommendationService;
 
+    private final Long recommendationId = 69L;
+
     private User createUser(Long id) {
         return User.builder()
                 .id(id)
@@ -233,4 +235,29 @@ class RecommendationServiceTest {
         verify(recommendationRepository).findById(recommendationId);
     }
 
+    @Test
+    void deleteRecommendationAssignment_recommendationStillExists_doesNotDeleteRecommendation() {
+        User user = createUser(1L);
+        when(recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId))
+                .thenReturn(true);
+
+        recommendationService.deleteRecommendationAssignment(user, recommendationId);
+
+        verify(recommendationAssignmentService).deleteRecommendationAssignmentByRecommendationId(user.getId(), recommendationId);
+        verify(recommendationAssignmentService).existsRecommendationInRecommendationAssignment(recommendationId);
+        verify(recommendationRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteRecommendationAssignment_recommendationNoLongerExists_deletesRecommendation() {
+        User user = createUser(1L);
+        when(recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId))
+                .thenReturn(false);
+
+        recommendationService.deleteRecommendationAssignment(user, recommendationId);
+
+        verify(recommendationAssignmentService).deleteRecommendationAssignmentByRecommendationId(user.getId(), recommendationId);
+        verify(recommendationAssignmentService).existsRecommendationInRecommendationAssignment(recommendationId);
+        verify(recommendationRepository).deleteById(recommendationId);
+    }
 }
