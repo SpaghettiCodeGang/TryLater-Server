@@ -187,7 +187,7 @@ public class RecommendationService {
     public void deleteRecommendationAssignment(User me, Long recommendationId) {
         recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(me.getId(), recommendationId);
         if (!recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId)) {
-            String imagePath = recommendationRepository.findById(recommendationId).get().getImgPath();
+            String imagePath = getRecommendationById(recommendationId).getImgPath();
             if (imagePath != null) {
                 imageService.deleteImageById(imagePath);
             }
