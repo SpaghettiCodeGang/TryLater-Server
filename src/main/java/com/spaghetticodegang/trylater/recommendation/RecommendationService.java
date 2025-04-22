@@ -173,5 +173,17 @@ public class RecommendationService {
         return recommendations.stream()
                 .map(this::createRecommendationResponseDto)
                 .collect(Collectors.toList());
+    /**
+     * Deletes a recommendation assignment from given user and recommendation ID.
+     * Deletes a recommendation at all if there is no recommendation assignment for that recommendation.
+     *
+     * @param me               the user that assignment should be deleted
+     * @param recommendationId the recommendation ID that assignment should be deleted
+     */
+    public void deleteRecommendationAssignment(User me, Long recommendationId) {
+        recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(me.getId(), recommendationId);
+        if (!recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId)) {
+            recommendationRepository.deleteById(recommendationId);
+        }
     }
 }

@@ -29,6 +29,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -185,5 +188,16 @@ class RecommendationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(1))
                 .andExpect(jsonPath("$[0].title").value("recommendation"));
+    
+    @Test  
+    void shouldReturn204_whenRecommendationAssignmentDeletedSuccessfully() throws Exception {
+        Long recommendationId = 1L;
+
+        doNothing().when(recommendationService)
+                .deleteRecommendationAssignment(any(User.class), eq(recommendationId));
+
+        mockMvc.perform(delete("/api/recommendation/{id}", recommendationId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 }
