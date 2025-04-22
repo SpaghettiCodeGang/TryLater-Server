@@ -3,6 +3,7 @@ package com.spaghetticodegang.trylater.image;
 import com.spaghetticodegang.trylater.shared.exception.ImageHandleException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.image.dto.ImageUploadResponseDto;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class ImageService {
      */
     public ImageUploadResponseDto createImageUploadResponseDto(Image image) {
         return ImageUploadResponseDto.builder()
-                .imageId(image.getImageId())
+                .imagePath(image.getImageId())
                 .build();
     }
 

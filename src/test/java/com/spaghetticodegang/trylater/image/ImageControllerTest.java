@@ -34,7 +34,7 @@ public class ImageControllerTest {
         mockRequestDto.setImageFile(mockImageFile);
 
         ImageUploadResponseDto mockResponseDto = ImageUploadResponseDto.builder()
-                .imageId("generatedId")
+                .imagePath("generatedId")
                 .build();
 
         when(imageService.uploadImage(mockImageFile)).thenReturn(mockResponseDto);

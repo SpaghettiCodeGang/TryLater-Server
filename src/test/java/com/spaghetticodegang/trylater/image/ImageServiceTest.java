@@ -74,7 +74,7 @@ class ImageServiceTest {
             ImageUploadResponseDto responseDto = imageService.uploadImage(mockImageFile);
 
             assertNotNull(responseDto);
-            assertEquals(expectedImageName, responseDto.getImageId());
+            assertEquals(expectedImageName, responseDto.getImagePath());
 
             verify(imageRepository, times(1)).save(imageCaptor.capture());
             assertEquals(expectedImageName, imageCaptor.getValue().getImageId());
