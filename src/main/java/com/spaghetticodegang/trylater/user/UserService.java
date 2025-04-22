@@ -1,9 +1,11 @@
 package com.spaghetticodegang.trylater.user;
 
+import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
+import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -134,5 +136,68 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("user.not.found"));
 
         return createUserResponseDto(user);
+    }
+
+    /**
+     * Updates the user profile with the new given entries.
+     * Authentication required for username, email and new password.
+     *
+     * @param me user entity that profile should be updated
+     * @param userMeUpdateDto request dto with the new data
+     * @return a full response DTO for the currently authenticated user
+     * @throws PasswordErrorException if password input for authentication is incorrect
+     * @throws ValidationException if username or email already exists
+     */
+    public UserMeResponseDto updateUserProfile(User me, UserMeUpdateDto userMeUpdateDto) {
+        final Map<String, String> errors = new HashMap<>();
+
+        final boolean wantsToChangeUsername = userMeUpdateDto.getUserName() != null && !userMeUpdateDto.getUserName().equals(me.getUserName());
+        final boolean wantsToChangeEmail = userMeUpdateDto.getEmail() != null && !userMeUpdateDto.getEmail().equals(me.getEmail());
+        final boolean wantsToChangePassword = userMeUpdateDto.getNewPassword() != null;
+
+        final boolean isSensitiveChange = wantsToChangeUsername || wantsToChangeEmail || wantsToChangePassword;
+
+        if (isSensitiveChange) {
+            if (userMeUpdateDto.getCurrentPassword() == null) {
+                throw new PasswordErrorException("update.password.notblank");
+            }
+            if (!passwordEncoder.matches(userMeUpdateDto.getCurrentPassword(), me.getPassword())) {
+                throw new PasswordErrorException("auth.invalid.password");
+            }
+        }
+
+        if (wantsToChangeUsername) {
+            if (userRepository.existsByUserName(userMeUpdateDto.getUserName())) {
+                errors.put("userName", messageUtil.get("user.username.exists"));
+            }
+            me.setUserName(userMeUpdateDto.getUserName());
+        }
+
+        if (wantsToChangeEmail) {
+            if (userRepository.existsByEmail(userMeUpdateDto.getEmail())) {
+                errors.put("email", messageUtil.get("user.email.exists"));
+            }
+            me.setEmail(userMeUpdateDto.getEmail());
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
+
+        if (wantsToChangePassword) {
+            me.setPassword(passwordEncoder.encode(userMeUpdateDto.getNewPassword()));
+        }
+
+        if (userMeUpdateDto.getDisplayName() != null) {
+            me.setDisplayName(userMeUpdateDto.getDisplayName());
+        }
+
+        if (userMeUpdateDto.getImgPath() != null) {
+            me.setImgPath(userMeUpdateDto.getImgPath());
+        }
+
+        userRepository.save(me);
+
+        return createUserMeResponseDto(me);
     }
 }

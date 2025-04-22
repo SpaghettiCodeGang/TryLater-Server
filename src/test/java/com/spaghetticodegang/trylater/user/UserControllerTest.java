@@ -4,17 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
+import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -23,9 +24,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -34,10 +34,10 @@ class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private MessageUtil messageUtil;
 
     @Autowired
@@ -124,4 +124,37 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.displayName").value("Search Test"))
                 .andExpect(jsonPath("$.imgPath").value("/assets/user.webp"));
     }
+
+    @Test
+    void shouldReturn200AndUpdatedUser_whenProfileUpdateIsValid() throws Exception {
+        var updateDto = new UserMeUpdateDto();
+        updateDto.setUserName("updatedTester");
+        updateDto.setDisplayName("Updated Tester");
+        updateDto.setEmail("updated@example.com");
+        updateDto.setCurrentPassword("oldPass123");
+        updateDto.setNewPassword("newPass456");
+        updateDto.setImgPath("/assets/updated.webp");
+
+        UserMeResponseDto updatedResponse = UserMeResponseDto.builder()
+                .id(mockUser.getId())
+                .userName(updateDto.getUserName())
+                .displayName(updateDto.getDisplayName())
+                .email(updateDto.getEmail())
+                .imgPath(updateDto.getImgPath())
+                .build();
+
+        when(userService.updateUserProfile(any(User.class), any(UserMeUpdateDto.class)))
+                .thenReturn(updatedResponse);
+
+        mockMvc.perform(patch("/api/user/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.userName").value("updatedTester"))
+                .andExpect(jsonPath("$.displayName").value("Updated Tester"))
+                .andExpect(jsonPath("$.email").value("updated@example.com"))
+                .andExpect(jsonPath("$.imgPath").value("/assets/updated.webp"));
+    }
+
 }

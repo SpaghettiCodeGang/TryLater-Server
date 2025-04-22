@@ -119,6 +119,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles authentication failures caused by incorrect password.
+     *
+     * @param ex the exception thrown when the password is not correct
+     * @return a 400 Bad Request response with a user-friendly error message
+     */
+    @ExceptionHandler(PasswordErrorException.class)
+    public ResponseEntity<Object> handleRecommendationNotFound(PasswordErrorException ex) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "message", messageUtil.get(ex.getMessage())
+        ));
+    }
+
+    /**
      * Handles authentication failures caused by non-existent recommendation assignment.
      *
      * @param ex the exception thrown when the recommendation assignment is not found

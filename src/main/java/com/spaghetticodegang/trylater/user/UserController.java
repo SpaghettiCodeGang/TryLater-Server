@@ -2,6 +2,7 @@ package com.spaghetticodegang.trylater.user;
 
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
+import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
 import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +55,18 @@ public class UserController {
     public ResponseEntity<UserResponseDto> searchUser(@RequestParam String user) {
         UserResponseDto userResponseDto = userService.searchUser(user);
         return ResponseEntity.ok(userResponseDto);
+    }
+
+    /**
+     * Handles the user profile update request by delegating to the service layer.
+     *
+     * @param me the currently authenticated user (injected by Spring Security)
+     * @param userMeUpdateDto the updated data provided by the user
+     * @return the updated user's public information
+     */
+    @PatchMapping("/me")
+    public ResponseEntity<UserMeResponseDto> updateUserProfile(@AuthenticationPrincipal User me, @RequestBody @Valid UserMeUpdateDto userMeUpdateDto) {
+        UserMeResponseDto userMeResponseDto = userService.updateUserProfile(me, userMeUpdateDto);
+        return ResponseEntity.ok(userMeResponseDto);
     }
 }
