@@ -142,7 +142,7 @@ class RecommendationControllerTest {
         when(recommendationService.updateRecommendationAssignmentStatus(any(User.class), any(Long.class), any(RecommendationAssignmentStatusRequestDto.class)))
                 .thenReturn(createRecommendationResponse());
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/api/recommendation/1")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/recommendation/assignment/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
@@ -162,7 +162,7 @@ class RecommendationControllerTest {
         when(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(any(User.class), any()))
                 .thenReturn(mockRecommendations);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/recommendation")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/recommendation/assignment")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -182,7 +182,7 @@ class RecommendationControllerTest {
         when(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(any(User.class), eq(RecommendationAssignmentStatus.ACCEPTED)))
                 .thenReturn(mockRecommendations);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/recommendation")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/recommendation/assignment")
                         .param("status", "ACCEPTED")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -197,7 +197,7 @@ class RecommendationControllerTest {
         doNothing().when(recommendationService)
                 .deleteRecommendationAssignment(any(User.class), eq(recommendationId));
 
-        mockMvc.perform(delete("/api/recommendation/{id}", recommendationId)
+        mockMvc.perform(delete("/api/recommendation/assignment/{id}", recommendationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
