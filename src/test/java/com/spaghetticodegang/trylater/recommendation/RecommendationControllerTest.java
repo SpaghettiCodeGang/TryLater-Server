@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,10 +43,10 @@ class RecommendationControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private RecommendationService recommendationService;
 
-    @MockBean
+    @MockitoBean
     private MessageUtil messageUtil;
 
     @Autowired
@@ -138,7 +139,7 @@ class RecommendationControllerTest {
         RecommendationAssignmentStatusRequestDto requestDto = new RecommendationAssignmentStatusRequestDto();
         requestDto.setRecommendationAssignmentStatus(RecommendationAssignmentStatus.ACCEPTED);
 
-        when(recommendationService.updateRecommendationAssignmentStatus(any(User.class), any(Long.class) , any(RecommendationAssignmentStatusRequestDto.class)))
+        when(recommendationService.updateRecommendationAssignmentStatus(any(User.class), any(Long.class), any(RecommendationAssignmentStatusRequestDto.class)))
                 .thenReturn(createRecommendationResponse());
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/api/recommendation/1")
@@ -155,6 +156,40 @@ class RecommendationControllerTest {
     }
 
     @Test
+    void shouldReturn200_whenGettingAllRecommendations() throws Exception {
+        List<RecommendationResponseDto> mockRecommendations = List.of(createRecommendationResponse());
+
+        when(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(any(User.class), any()))
+                .thenReturn(mockRecommendations);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/recommendation")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].title").value("recommendation"))
+                .andExpect(jsonPath("$[0].imgPath").value("/assets/img.webp"))
+                .andExpect(jsonPath("$[0].creator.userName").value("tester"))
+                .andExpect(jsonPath("$[0].tagGroups[0].tagGroupName").value("Genre"))
+                .andExpect(jsonPath("$[0].tagGroups[0].tags[0].tagName").value("Action"));
+    }
+
+    @Test
+    void shouldReturn200_whenGettingAllRecommendationsWithStatusFilter() throws Exception {
+        List<RecommendationResponseDto> mockRecommendations = List.of(createRecommendationResponse());
+
+        when(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(any(User.class), eq(RecommendationAssignmentStatus.ACCEPTED)))
+                .thenReturn(mockRecommendations);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/recommendation")
+                        .param("status", "ACCEPTED")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].title").value("recommendation"));
+    
+    @Test  
     void shouldReturn204_whenRecommendationAssignmentDeletedSuccessfully() throws Exception {
         Long recommendationId = 1L;
 
