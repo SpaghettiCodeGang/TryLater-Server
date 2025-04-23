@@ -23,20 +23,20 @@ public class ImageRepositoryTest {
     @Test
     void testSaveAndFindById() {
         Image image = Image.builder()
-                .imageId("test-image-123")
+                .imgPath("test-image-123")
                 .build();
 
         Image savedImage = imageRepository.save(image);
-        Optional<Image> foundImage = imageRepository.findById(savedImage.getImageId());
+        Optional<Image> foundImage = imageRepository.findById(savedImage.getImgPath());
 
         assertTrue(foundImage.isPresent());
-        assertEquals(image.getImageId(), foundImage.get().getImageId());
+        assertEquals(image.getImgPath(), foundImage.get().getImgPath());
     }
 
     @Test
     void testExistsById() {
         Image image = Image.builder()
-                .imageId("existing-image")
+                .imgPath("existing-image")
                 .build();
         entityManager.persist(image);
         entityManager.flush();
@@ -51,7 +51,7 @@ public class ImageRepositoryTest {
     @Test
     void testDeleteById() {
         Image image = Image.builder()
-                .imageId("to-be-deleted")
+                .imgPath("to-be-deleted")
                 .build();
         entityManager.persist(image);
         entityManager.flush();
@@ -65,7 +65,7 @@ public class ImageRepositoryTest {
     @Test
     void testDelete() {
         Image image = Image.builder()
-                .imageId("another-delete")
+                .imgPath("another-delete")
                 .build();
         entityManager.persist(image);
         entityManager.flush();

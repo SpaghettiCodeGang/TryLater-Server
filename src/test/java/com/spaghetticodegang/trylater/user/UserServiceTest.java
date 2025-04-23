@@ -362,14 +362,14 @@ class UserServiceTest {
         when(userRepository.findById(69L)).thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        when(imageService.deleteImageById("/assets/old.webp")).thenReturn(true);
+        when(imageService.deleteImageByImgPath("/assets/old.webp")).thenReturn(true);
 
         UserMeResponseDto response = userService.updateUserProfile(user, dto);
 
         assertEquals("/assets/cool.webp", user.getImgPath());
         assertEquals("/assets/cool.webp", response.getImgPath());
 
-        verify(imageService).deleteImageById("/assets/old.webp");
+        verify(imageService).deleteImageByImgPath("/assets/old.webp");
     }
 
     @Test
@@ -392,7 +392,7 @@ class UserServiceTest {
         assertEquals("/assets/cool.webp", user.getImgPath());
         assertEquals("/assets/cool.webp", response.getImgPath());
 
-        verify(imageService, never()).deleteImageById(anyString());
+        verify(imageService, never()).deleteImageByImgPath(anyString());
     }
 
 }

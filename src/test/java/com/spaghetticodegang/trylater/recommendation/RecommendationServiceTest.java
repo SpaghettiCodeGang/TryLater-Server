@@ -309,7 +309,7 @@ class RecommendationServiceTest {
                 .existsRecommendationInRecommendationAssignment(recommendationId);
         verify(recommendationRepository).findById(recommendationId);
         verify(recommendationRepository).deleteById(recommendationId);
-        verify(imageService).deleteImageById("some/image/path.jpg");
+        verify(imageService).deleteImageByImgPath("some/image/path.jpg");
     }
 
     @Test

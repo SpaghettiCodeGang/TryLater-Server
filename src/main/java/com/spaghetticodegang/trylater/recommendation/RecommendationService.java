@@ -189,7 +189,7 @@ public class RecommendationService {
         if (!recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId)) {
             String imagePath = getRecommendationById(recommendationId).getImgPath();
             if (imagePath != null) {
-                imageService.deleteImageById(imagePath);
+                imageService.deleteImageByImgPath(imagePath);
             }
             recommendationRepository.deleteById(recommendationId);
         }

@@ -34,7 +34,7 @@ public class ImageControllerTest {
         mockRequestDto.setImageFile(mockImageFile);
 
         ImageUploadResponseDto mockResponseDto = ImageUploadResponseDto.builder()
-                .imagePath("generatedId")
+                .imgPath("generatedId")
                 .build();
 
         when(imageService.uploadImage(mockImageFile)).thenReturn(mockResponseDto);
@@ -48,23 +48,23 @@ public class ImageControllerTest {
 
     @Test
     void deleteImage_success() {
-        String imageIdToDelete = "existingImageId";
-        when(imageService.deleteImageById(imageIdToDelete)).thenReturn(true);
+        String imgPathToDelete = "existingImgPath";
+        when(imageService.deleteImageByImgPath(imgPathToDelete)).thenReturn(true);
 
-        ResponseEntity<Void> response = imageController.deleteImage(imageIdToDelete);
+        ResponseEntity<Void> response = imageController.deleteImage(imgPathToDelete);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(imageService, times(1)).deleteImageById(imageIdToDelete);
+        verify(imageService, times(1)).deleteImageByImgPath(imgPathToDelete);
     }
 
     @Test
     void deleteImage_notFound() {
-        String nonExistingImageId = "nonExistingId";
-        when(imageService.deleteImageById(nonExistingImageId)).thenReturn(false);
+        String nonExistingImgPath = "nonExistingId";
+        when(imageService.deleteImageByImgPath(nonExistingImgPath)).thenReturn(false);
 
-        ResponseEntity<Void> response = imageController.deleteImage(nonExistingImageId);
+        ResponseEntity<Void> response = imageController.deleteImage(nonExistingImgPath);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        verify(imageService, times(1)).deleteImageById(nonExistingImageId);
+        verify(imageService, times(1)).deleteImageByImgPath(nonExistingImgPath);
     }
 }

@@ -197,7 +197,7 @@ public class UserService implements UserDetailsService {
         if (userMeUpdateDto.getImgPath() != null) {
             String currentImagePath = findUserById(me.getId()).getImgPath();
             if (currentImagePath != null) {
-                imageService.deleteImageById(currentImagePath);
+                imageService.deleteImageByImgPath(currentImagePath);
             }
             me.setImgPath(userMeUpdateDto.getImgPath());
         }

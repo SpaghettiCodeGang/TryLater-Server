@@ -53,7 +53,7 @@ class ImageServiceTest {
         }
     }
 
-    private String getImageIdFromUpload(MultipartFile file) {
+    private String getimgPathFromUpload(MultipartFile file) {
         String originalFilename = Objects.requireNonNull(file.getOriginalFilename());
         String imageType = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
         return UUID.randomUUID() + "." + imageType;
@@ -74,10 +74,10 @@ class ImageServiceTest {
             ImageUploadResponseDto responseDto = imageService.uploadImage(mockImageFile);
 
             assertNotNull(responseDto);
-            assertEquals(expectedImageName, responseDto.getImagePath());
+            assertEquals(expectedImageName, responseDto.getImgPath());
 
             verify(imageRepository, times(1)).save(imageCaptor.capture());
-            assertEquals(expectedImageName, imageCaptor.getValue().getImageId());
+            assertEquals(expectedImageName, imageCaptor.getValue().getImgPath());
 
             verify(messageUtil, never()).get(anyString());
             Path path = Paths.get(expectedImagePath);
@@ -96,7 +96,7 @@ class ImageServiceTest {
 
         verify(imageRepository, never()).save(any());
         verify(messageUtil, times(1)).get("image.wrong.type");
-        assertFalse(Files.exists(testUploadDirPath.resolve(getImageIdFromUpload(mockImageFile))));
+        assertFalse(Files.exists(testUploadDirPath.resolve(getimgPathFromUpload(mockImageFile))));
     }
 
     @Test
@@ -112,7 +112,7 @@ class ImageServiceTest {
         verify(imageRepository, never()).save(any());
         verify(messageUtil, times(1)).get("image.upload.error");
         verify(mockImageFile, times(1)).transferTo(any(Path.class));
-        assertFalse(Files.exists(testUploadDirPath.resolve(getImageIdFromUpload(mockImageFile))));
+        assertFalse(Files.exists(testUploadDirPath.resolve(getimgPathFromUpload(mockImageFile))));
     }
 
     @Test
@@ -121,7 +121,7 @@ class ImageServiceTest {
         Path filePath = Paths.get(TEST_UPLOAD_DIR, testUuid);
         Files.createFile(filePath);
         when(messageUtil.get("image.delete.error")).thenReturn("Failed to delete image.");
-        boolean result = imageService.deleteImageById(testUuid);
+        boolean result = imageService.deleteImageByImgPath(testUuid);
 
         assertTrue(result);
         assertFalse(Files.exists(filePath));
@@ -132,7 +132,7 @@ class ImageServiceTest {
         String nonExistingUuid = "non-existing-uuid.png";
         Path filePath = Paths.get(TEST_UPLOAD_DIR, nonExistingUuid);
         when(messageUtil.get("image.delete.error")).thenReturn("Failed to delete image.");
-        boolean result = imageService.deleteImageById(nonExistingUuid);
+        boolean result = imageService.deleteImageByImgPath(nonExistingUuid);
 
         assertFalse(result);
         assertFalse(Files.exists(filePath));
@@ -140,8 +140,8 @@ class ImageServiceTest {
 
     @Test
     void deleteImageById_shouldThrowException_whenIOExceptionOccurs(){
-        String imageId = "test-image.jpg";
-        Path filePath = Paths.get(TEST_UPLOAD_DIR, imageId);
+        String imgPath = "test-image.jpg";
+        Path filePath = Paths.get(TEST_UPLOAD_DIR, imgPath);
 
         when(messageUtil.get("image.delete.error")).thenReturn("Failed to delete image.");
 
@@ -151,7 +151,7 @@ class ImageServiceTest {
                     .thenThrow(new IOException("Access denied."));
 
             assertThrows(ImageHandleException.class, () -> {
-                imageService.deleteImageById(imageId);
+                imageService.deleteImageByImgPath(imgPath);
             });
         }
     }

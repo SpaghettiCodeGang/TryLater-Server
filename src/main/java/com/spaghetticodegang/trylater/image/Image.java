@@ -16,5 +16,5 @@ import lombok.*;
 public class Image {
 
     @Id
-    String imageId;
+    String imgPath;
 }

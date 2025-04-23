@@ -8,18 +8,18 @@ public class ImageUploadResponseDtoTest {
 
     @Test
     void testBuilderAndGetterSetter() {
-        String imageId = "uniqueImageId";
+        String imgPath = "uniqueImgPath";
 
         ImageUploadResponseDto responseDto = ImageUploadResponseDto.builder()
-                .imagePath(imageId)
+                .imgPath(imgPath)
                 .build();
 
         assertNotNull(responseDto);
-        assertEquals(imageId, responseDto.getImagePath());
+        assertEquals(imgPath, responseDto.getImgPath());
 
-        String newImageId = "anotherId";
-        responseDto.setImagePath(newImageId);
-        assertEquals(newImageId, responseDto.getImagePath());
+        String newImgPath = "anotherId";
+        responseDto.setImgPath(newImgPath);
+        assertEquals(newImgPath, responseDto.getImgPath());
     }
 
     @Test
@@ -27,6 +27,6 @@ public class ImageUploadResponseDtoTest {
         ImageUploadResponseDto responseDto = ImageUploadResponseDto.builder().build();
 
         assertNotNull(responseDto);
-        assertNull(responseDto.getImagePath());
+        assertNull(responseDto.getImgPath());
     }
 }

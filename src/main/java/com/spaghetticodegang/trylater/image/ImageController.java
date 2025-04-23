@@ -42,20 +42,20 @@ public class ImageController {
 
     /**
      * Handles the deletion of an image based on its unique ID.
-     * This endpoint accepts the image ID as a query parameter named "imageId"
-     * and delegates the deletion process to the {@link ImageService#deleteImageById(String)} method.
+     * This endpoint accepts the image ID as a query parameter named "imgPath"
+     * and delegates the deletion process to the {@link ImageService#deleteImageByImgPath(String)} method.
      * If the image is successfully deleted, it returns a {@link ResponseEntity}
      * with an HTTP status code 204 (NO_CONTENT). If the image with the given ID
      * is not found, it returns a {@link ResponseEntity} with an HTTP status code 404 (NOT_FOUND).
      *
-     * @param id The unique identifier of the image to be deleted, provided as a query parameter named "imageId".
+     * @param id The unique identifier of the image to be deleted, provided as a query parameter named "imgPath".
      * Must not be {@code null} or empty.
      * @return A {@link ResponseEntity} with HTTP status code 204 (NO_CONTENT) if the image was
      * successfully deleted, or 404 (NOT_FOUND) if the image with the given ID does not exist.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteImage(@PathVariable("id") String id) {
-        boolean isDeleted = imageService.deleteImageById(id);
+        boolean isDeleted = imageService.deleteImageByImgPath(id);
 
         if (!isDeleted) {
             return ResponseEntity.notFound().build();

@@ -40,7 +40,7 @@ public class ImageService {
      */
     public ImageUploadResponseDto createImageUploadResponseDto(Image image) {
         return ImageUploadResponseDto.builder()
-                .imagePath(image.getImageId())
+                .imgPath(image.getImgPath())
                 .build();
     }
 
@@ -73,7 +73,7 @@ public class ImageService {
             imageFile.transferTo(path);
 
             final Image image = Image.builder()
-                    .imageId(imageName)
+                    .imgPath(imageName)
                     .build();
 
             imageRepository.save(image);
@@ -87,21 +87,21 @@ public class ImageService {
     /**
      * Deletes an image file from the file system based on its unique ID.
      * This method attempts to delete the file located at the path constructed
-     * using the configured upload directory and the provided {@code imageId}.
+     * using the configured upload directory and the provided {@code imgPath}.
      *
-     * @param imageId The unique identifier of the image to be deleted.
+     * @param imgPath The unique identifier of the image to be deleted.
      *                This should match the filename (including extension) of the image file.
      * @return {@code true} if the image file was successfully deleted;
      * {@code false} if the file does not exist.
      * @throws ImageHandleException If an {@link IOException} occurs during the deletion process.
      */
-    public boolean deleteImageById(String imageId) {
-        Path filePath = Paths.get(uploadDir, imageId);
+    public boolean deleteImageByImgPath(String imgPath) {
+        Path filePath = Paths.get(uploadDir, imgPath);
         if (!Files.exists(filePath)) {
             return false;
         }
         try {
-            imageRepository.deleteById(imageId);
+            imageRepository.deleteById(imgPath);
             return Files.deleteIfExists(filePath);
         } catch (IOException e) {
             throw new ImageHandleException(Map.of("image", messageUtil.get("image.delete.error") + e.getMessage()));
