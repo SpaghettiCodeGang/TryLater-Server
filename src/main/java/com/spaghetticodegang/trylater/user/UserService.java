@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.user;
 
+import com.spaghetticodegang.trylater.image.ImageService;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final MessageUtil messageUtil;
 
@@ -193,6 +195,10 @@ public class UserService implements UserDetailsService {
         }
 
         if (userMeUpdateDto.getImgPath() != null) {
+            String currentImagePath = findUserById(me.getId()).getImgPath();
+            if (currentImagePath != null) {
+                imageService.deleteImageById(currentImagePath);
+            }
             me.setImgPath(userMeUpdateDto.getImgPath());
         }
 
