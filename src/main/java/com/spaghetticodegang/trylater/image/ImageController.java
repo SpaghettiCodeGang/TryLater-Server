@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
  * and deleting images. All requests are mapped under the "/api/images" base path.
  */
 @RestController
-@RequestMapping("/api/images")
+@RequestMapping("/api/image")
 @RequiredArgsConstructor
 public class ImageController {
 
