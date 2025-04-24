@@ -45,7 +45,7 @@ public class RecommendationController {
      * @param recommendationAssignmentStatus the recommendation assignment status
      * @return the created recommendation as a response DTO
      */
-    @PatchMapping("/assignment/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<RecommendationResponseDto> updateRecommendationAssignmentStatus(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationAssignmentId, @RequestBody @Valid RecommendationAssignmentStatusRequestDto recommendationAssignmentStatus) {
         RecommendationResponseDto recommendationResponseDto = recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, recommendationAssignmentStatus);
         return ResponseEntity.ok(recommendationResponseDto);
@@ -58,7 +58,7 @@ public class RecommendationController {
      * @param recommendationAssignmentStatus the status of the assignment
      * @return a list of all the assigned recommendation with that specified status
      */
-    @GetMapping("/assignment")
+    @GetMapping
     public ResponseEntity<List<RecommendationResponseDto>> getAllRecommendations(@AuthenticationPrincipal User me, @RequestParam(name = "status", required = false) RecommendationAssignmentStatus recommendationAssignmentStatus) {
         return ResponseEntity.ok(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(me, recommendationAssignmentStatus));
     }
@@ -70,7 +70,7 @@ public class RecommendationController {
      * @param recommendationId the ID of the recommendation that assignment should delete
      * @return A {@link ResponseEntity} with HTTP status code 204 (NO_CONTENT)
      */
-    @DeleteMapping("/assignment/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecommendationAssignment(@AuthenticationPrincipal User me, @PathVariable("id") Long recommendationId) {
         recommendationService.deleteRecommendationAssignment(me, recommendationId);
         return ResponseEntity.noContent().build();
