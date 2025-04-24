@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -145,7 +146,7 @@ public class RecommendationService {
      * @throws ValidationException if the receiver is not a valid contact
      */
     private User validateReceiver(User sender, Long receiverId) {
-        if (!contactService.existsByUserIds(sender.getId(), receiverId)) {
+        if (!(contactService.existsByUserIds(sender.getId(), receiverId) || Objects.equals(receiverId, sender.getId()))) {
             throw new ValidationException(Map.of("receiver", messageUtil.get("recommendation.receiver.not.valid")));
         }
         return userService.findUserById(receiverId);

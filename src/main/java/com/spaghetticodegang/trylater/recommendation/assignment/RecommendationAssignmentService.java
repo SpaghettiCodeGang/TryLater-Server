@@ -36,7 +36,7 @@ public class RecommendationAssignmentService {
                 .recommendation(recommendation)
                 .receiver(receiver)
                 .sentAt(LocalDateTime.now())
-                .recommendationAssignmentStatus(RecommendationAssignmentStatus.SENT)
+                .recommendationAssignmentStatus(Objects.equals(recommendation.getCreator().getId(), receiver.getId()) ? RecommendationAssignmentStatus.ACCEPTED : RecommendationAssignmentStatus.SENT)
                 .build();
 
         recommendationAssignmentRepository.save(recommendationAssignment);
@@ -89,7 +89,7 @@ public class RecommendationAssignmentService {
     /**
      * Delegates the get request from the recommendation service to the assignment repository for a given user and assignment status.
      *
-     * @param me the currently authenticated user
+     * @param me                             the currently authenticated user
      * @param recommendationAssignmentStatus the given status for the assigned recommendations
      * @return a list with recommendation entities or an empty list
      */
@@ -100,7 +100,7 @@ public class RecommendationAssignmentService {
     /**
      * Deletes a recommendation assignment by its user ID and recommendation ID.
      *
-     * @param userId the user ID
+     * @param userId           the user ID
      * @param recommendationId the recommendation ID
      * @throws RecommendationAssignmentNotFoundException if there is no assignment for the given user and recommendation.
      */
@@ -115,7 +115,7 @@ public class RecommendationAssignmentService {
     /**
      * Returns a {@link RecommendationAssignment} entity for a given user ID and recommendation ID.
      *
-     * @param userId the user ID
+     * @param userId           the user ID
      * @param recommendationId the recommendation ID
      * @return A {@link RecommendationAssignment} entity
      */
