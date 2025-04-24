@@ -54,7 +54,7 @@ public class RecommendationController {
     /**
      * Handles request to get all assigned recommendations by delegating to the service layer.
      *
-     * @param me the currently authenticated user (requester)
+     * @param me                             the currently authenticated user (requester)
      * @param recommendationAssignmentStatus the status of the assignment
      * @return a list of all the assigned recommendation with that specified status
      */
@@ -63,11 +63,11 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendationService.getAllRecommendationsByUserAndRecommendationStatus(me, recommendationAssignmentStatus));
     }
 
-     /**
+    /**
      * Deletes a recommendation assignment by delegating to the service layer.
      *
-     * @param me                             the currently authenticated user (requester)
-     * @param recommendationId     the ID of the recommendation that assignment should delete
+     * @param me               the currently authenticated user (requester)
+     * @param recommendationId the ID of the recommendation that assignment should delete
      * @return A {@link ResponseEntity} with HTTP status code 204 (NO_CONTENT)
      */
     @DeleteMapping("/assignment/{id}")

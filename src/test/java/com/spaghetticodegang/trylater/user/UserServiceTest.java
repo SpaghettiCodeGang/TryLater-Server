@@ -1,5 +1,6 @@
 package com.spaghetticodegang.trylater.user;
 
+import com.spaghetticodegang.trylater.image.ImageService;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,6 +36,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private ImageService imageService;
 
     @Test
     void shouldLoadUserByUsernameOrEmail() {
@@ -344,6 +349,33 @@ class UserServiceTest {
     @Test
     void shouldUpdateProfileWithoutPassword_whenOnlyImgPathChanges() {
         User user = User.builder()
+                .id(69L)
+                .userName("tester")
+                .email("test@example.com")
+                .password("encodedPass")
+                .imgPath("/assets/old.webp")
+                .build();
+
+        UserMeUpdateDto dto = new UserMeUpdateDto();
+        dto.setImgPath("/assets/cool.webp");
+
+        when(userRepository.findById(69L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        when(imageService.deleteImageByImgPath("/assets/old.webp")).thenReturn(true);
+
+        UserMeResponseDto response = userService.updateUserProfile(user, dto);
+
+        assertEquals("/assets/cool.webp", user.getImgPath());
+        assertEquals("/assets/cool.webp", response.getImgPath());
+
+        verify(imageService).deleteImageByImgPath("/assets/old.webp");
+    }
+
+    @Test
+    void shouldUpdateProfileWithoutPassword_whenOnlyImgPathChangesAndCurrentImgPathIsNull() {
+        User user = User.builder()
+                .id(69L)
                 .userName("tester")
                 .email("test@example.com")
                 .password("encodedPass")
@@ -352,12 +384,15 @@ class UserServiceTest {
         UserMeUpdateDto dto = new UserMeUpdateDto();
         dto.setImgPath("/assets/cool.webp");
 
+        when(userRepository.findById(69L)).thenReturn(Optional.of(user));
         when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         UserMeResponseDto response = userService.updateUserProfile(user, dto);
 
         assertEquals("/assets/cool.webp", user.getImgPath());
         assertEquals("/assets/cool.webp", response.getImgPath());
+
+        verify(imageService, never()).deleteImageByImgPath(anyString());
     }
 
 }
