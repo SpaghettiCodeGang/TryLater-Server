@@ -129,6 +129,33 @@ class RecommendationServiceTest {
     }
 
     @Test
+    void shouldCreateRecommendationSuccessfullyToYourself() {
+        User creator = createUser(1L);
+        User receiver = createUser(1L);
+        Category category = createCategory(CategoryType.MEDIA);
+        Tag tag = createTag(10L, category);
+        RecommendationRequestDto request = createRequestDto(CategoryType.MEDIA, List.of(tag.getId()), List.of(receiver.getId()));
+
+        when(categoryRepository.findByCategoryType(CategoryType.MEDIA)).thenReturn(Optional.of(category));
+        when(tagService.getTagById(tag.getId())).thenReturn(tag);
+        when(contactService.existsByUserIds(creator.getId(), receiver.getId())).thenReturn(true);
+        when(userService.findUserById(receiver.getId())).thenReturn(receiver);
+        when(userService.createUserResponseDto(creator)).thenReturn(UserResponseDto.builder().id(1L).build());
+        when(tagService.createTagGroupResponseDtoFromTags(anyList())).thenReturn(List.of());
+
+        RecommendationResponseDto result = recommendationService.createRecommendation(creator, request);
+
+        assertNotNull(result);
+        assertEquals("recommendation", result.getTitle());
+        assertEquals("description", result.getDescription());
+        assertEquals("./assets/img.png", result.getImgPath());
+        assertEquals(2L, result.getRating());
+        assertEquals(CategoryType.MEDIA, result.getCategory());
+        verify(recommendationRepository).save(any(Recommendation.class));
+        verify(recommendationAssignmentService).createRecommendationAssignment(any(Recommendation.class), eq(receiver));
+    }
+
+    @Test
     void shouldThrowValidationException_whenCategoryNotFound() {
         User creator = createUser(1L);
         RecommendationRequestDto request = createRequestDto(CategoryType.MEDIA, List.of(), List.of());

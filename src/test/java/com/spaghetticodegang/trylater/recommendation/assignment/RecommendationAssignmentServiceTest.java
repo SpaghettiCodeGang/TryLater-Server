@@ -57,6 +57,7 @@ class RecommendationAssignmentServiceTest {
         return Recommendation.builder()
                 .id(1L)
                 .title("recommendation")
+                .creator(authenticatedUser)
                 .build();
     }
 
@@ -78,6 +79,20 @@ class RecommendationAssignmentServiceTest {
                 assignment.getRecommendation().equals(recommendation) &&
                         assignment.getReceiver().equals(receiver) &&
                         assignment.getRecommendationAssignmentStatus() == RecommendationAssignmentStatus.SENT &&
+                        assignment.getSentAt() != null && assignment.getSentAt().isBefore(LocalDateTime.now().plusSeconds(1))
+        ));
+    }
+
+    @Test
+    void shouldCreateRecommendationAssignmentSuccessfullyToYourself() {
+        Recommendation recommendation = createRecommendation();
+
+        recommendationAssignmentService.createRecommendationAssignment(recommendation, authenticatedUser);
+
+        verify(recommendationAssignmentRepository, times(1)).save(argThat(assignment ->
+                assignment.getRecommendation().equals(recommendation) &&
+                        assignment.getReceiver().equals(authenticatedUser) &&
+                        assignment.getRecommendationAssignmentStatus() == RecommendationAssignmentStatus.ACCEPTED &&
                         assignment.getSentAt() != null && assignment.getSentAt().isBefore(LocalDateTime.now().plusSeconds(1))
         ));
     }
