@@ -1,6 +1,7 @@
 package com.spaghetticodegang.trylater.recommendation;
 
 import com.spaghetticodegang.trylater.contact.ContactService;
+import com.spaghetticodegang.trylater.image.ImageService;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignment;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentService;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentStatus;
@@ -37,6 +38,7 @@ public class RecommendationService {
     private final TagService tagService;
     private final UserService userService;
     private final ContactService contactService;
+    private final ImageService imageService;
     private final MessageUtil messageUtil;
 
     /**
@@ -185,6 +187,10 @@ public class RecommendationService {
     public void deleteRecommendationAssignment(User me, Long recommendationId) {
         recommendationAssignmentService.deleteRecommendationAssignmentByRecommendationId(me.getId(), recommendationId);
         if (!recommendationAssignmentService.existsRecommendationInRecommendationAssignment(recommendationId)) {
+            String imagePath = getRecommendationById(recommendationId).getImgPath();
+            if (imagePath != null) {
+                imageService.deleteImageByImgPath(imagePath);
+            }
             recommendationRepository.deleteById(recommendationId);
         }
     }

@@ -3,7 +3,7 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 class Image {
-    - id : String
+    - imgPath : String
     + constructor()
     + getter()
     + setter()
@@ -16,16 +16,13 @@ interface ImageRepository {
 class ImageService {
     - imageRepository : ImageRepository
     + uploadImage(imageFile : MultipartFile)
-    + uploadImageWithScaling(imageFile : MultipartFile, int : targetWidth, int : targetHeight)
-    + deleteImageById(imageId : String)
+    + deleteImageByImgPath(imgPath : String)
     - getImageType(String : imageName)
-    - resizeImage(BufferedImage : originalImage, int : targetWidth, int : targetHeight)
     - validateImage(imageFile : MultipartFile)
 }
 class ImageController {
     - imageService : ImageService
     + POST /api/images() <<secured>>
-    + POST /api/images/scaling() <<secured>>
     + DELETE /api/images() <<secured>>
 }
 

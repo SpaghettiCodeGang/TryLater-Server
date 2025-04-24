@@ -8,16 +8,16 @@ public class ImageTest {
 
     @Test
     void testBuilderAndGetterSetter() {
-        String imageId = "testImageId";
+        String imgPath = "testImgPath";
 
         Image image = Image.builder()
-                .imageId(imageId)
+                .imgPath(imgPath)
                 .build();
 
         assertNotNull(image);
-        assertEquals(imageId, image.getImageId());
+        assertEquals(imgPath, image.getImgPath());
 
-        assertEquals(imageId, image.getImageId());
+        assertEquals(imgPath, image.getImgPath());
     }
 
     @Test
@@ -25,17 +25,17 @@ public class ImageTest {
         Image image = new Image();
 
         assertNotNull(image);
-        assertNull(image.getImageId());
+        assertNull(image.getImgPath());
     }
 
     @Test
     void testAllArgsConstructor() {
-        String imageId = "fullArgsConstructorId";
+        String imgPath = "fullArgsConstructorId";
 
-        Image image = new Image(imageId);
+        Image image = new Image(imgPath);
 
         assertNotNull(image);
-        assertEquals(imageId, image.getImageId());
+        assertEquals(imgPath, image.getImgPath());
     }
 
     @Test
@@ -43,6 +43,6 @@ public class ImageTest {
         Image image = Image.builder().build();
 
         assertNotNull(image);
-        assertNull(image.getImageId());
+        assertNull(image.getImgPath());
     }
 }

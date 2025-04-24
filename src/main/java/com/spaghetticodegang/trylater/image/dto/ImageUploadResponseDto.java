@@ -10,7 +10,6 @@ import lombok.Setter;
 @Builder
 public class ImageUploadResponseDto {
 
-    private String imageId;
-    private String imagePath;
+    private String imgPath;
 
 }
