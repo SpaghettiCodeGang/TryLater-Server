@@ -1,7 +1,6 @@
 package com.spaghetticodegang.trylater.user;
 
 import com.spaghetticodegang.trylater.contact.ContactRepository;
-import com.spaghetticodegang.trylater.contact.ContactService;
 import com.spaghetticodegang.trylater.image.ImageService;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
