@@ -77,7 +77,7 @@ public class SecurityConfig {
 
                     // Authorization rules
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(HttpMethod.GET, "/").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/", "/index.html", "/static/**", "/assets/**", "/favicon.ico").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                             .requestMatchers("/h2-console/**").permitAll()
