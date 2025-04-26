@@ -170,7 +170,7 @@ class RecommendationAssignmentServiceTest {
         when(recommendationAssignmentRepository.findById(recommendationAssignmentId)).thenReturn(Optional.of(existingAssignment));
         when(recommendationAssignmentRepository.save(any(RecommendationAssignment.class))).thenReturn(existingAssignment);
 
-        Long updatedId = recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationAssignmentId, requestDto);
+        recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationId, requestDto);
 
         assertEquals(recommendationAssignmentId, updatedId);
         assertEquals(RecommendationAssignmentStatus.ACCEPTED, existingAssignment.getRecommendationAssignmentStatus());
