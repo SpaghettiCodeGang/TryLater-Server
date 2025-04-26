@@ -1,7 +1,9 @@
 package com.spaghetticodegang.trylater.recommendation.assignment;
 
 import com.spaghetticodegang.trylater.recommendation.Recommendation;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -48,4 +50,12 @@ public interface RecommendationAssignmentRepository extends JpaRepository<Recomm
             WHERE r.recommendation.id = :recommendationId
             """)
     boolean existsRecommendationAssignmentByRecommendationId(Long recommendationId);
+
+
+    @Transactional
+    @Modifying
+    @Query("""
+            DELETE FROM RecommendationAssignment r WHERE r.receiver.id = :userId
+            """)
+    void deleteRecommendationAssignmentsByUserId(Long userId);
 }

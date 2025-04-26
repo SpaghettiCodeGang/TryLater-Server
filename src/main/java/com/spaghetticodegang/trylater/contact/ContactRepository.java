@@ -77,5 +77,5 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     @Query("""
             DELETE FROM Contact c WHERE c.receiver.id = :userId OR c.requester.id = :userId
             """)
-    void deleteByUserId(Long userId);
+    void deleteContactsByUserId(Long userId);
 }

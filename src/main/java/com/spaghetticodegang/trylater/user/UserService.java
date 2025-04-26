@@ -2,6 +2,7 @@ package com.spaghetticodegang.trylater.user;
 
 import com.spaghetticodegang.trylater.contact.ContactRepository;
 import com.spaghetticodegang.trylater.image.ImageService;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentRepository;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
@@ -29,6 +30,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final MessageUtil messageUtil;
     private final ContactRepository contactRepository;
+    private final RecommendationAssignmentRepository recommendationAssignmentRepository;
 
     /**
      * Loads a user by username or email for authentication.
@@ -206,6 +208,11 @@ public class UserService implements UserDetailsService {
         return createUserMeResponseDto(me);
     }
 
+    /**
+     * Deletes an user profile and manages the handling for deleting the contacts and assignments for that user.
+     * @param me user that should delete
+     * @param userMeDeleteDto the dto for the request
+     */
     public void deleteUserProfile(User me, UserMeDeleteDto userMeDeleteDto) {
         if (!passwordEncoder.matches(userMeDeleteDto.getPassword(), me.getPassword())) {
             throw new PasswordErrorException("auth.invalid.password");
@@ -214,8 +221,8 @@ public class UserService implements UserDetailsService {
             imageService.deleteImageByImgPath(me.getImgPath());
         }
 
-        contactRepository.deleteByUserId(me.getId());
-        //delete assignments
+        contactRepository.deleteContactsByUserId(me.getId());
+        recommendationAssignmentRepository.deleteRecommendationAssignmentsByUserId(me.getId());
         //is user creator ? make as prepToDelete : deleteUser
         // in delete recommendation 
         //userRepository.delete(me);
