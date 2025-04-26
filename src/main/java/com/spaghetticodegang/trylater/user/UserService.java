@@ -1,13 +1,12 @@
 package com.spaghetticodegang.trylater.user;
 
+import com.spaghetticodegang.trylater.contact.ContactRepository;
+import com.spaghetticodegang.trylater.contact.ContactService;
 import com.spaghetticodegang.trylater.image.ImageService;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
-import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
-import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
-import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
-import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
+import com.spaghetticodegang.trylater.user.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,6 +29,7 @@ public class UserService implements UserDetailsService {
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final MessageUtil messageUtil;
+    private final ContactRepository contactRepository;
 
     /**
      * Loads a user by username or email for authentication.
@@ -205,5 +205,20 @@ public class UserService implements UserDetailsService {
         userRepository.save(me);
 
         return createUserMeResponseDto(me);
+    }
+
+    public void deleteUserProfile(User me, UserMeDeleteDto userMeDeleteDto) {
+        if (!passwordEncoder.matches(userMeDeleteDto.getPassword(), me.getPassword())) {
+            throw new PasswordErrorException("auth.invalid.password");
+        }
+        if (me.getImgPath() != null) {
+            imageService.deleteImageByImgPath(me.getImgPath());
+        }
+
+        contactRepository.deleteByUserId(me.getId());
+        //delete assignments
+        //is user creator ? make as prepToDelete : deleteUser
+        // in delete recommendation 
+        //userRepository.delete(me);
     }
 }

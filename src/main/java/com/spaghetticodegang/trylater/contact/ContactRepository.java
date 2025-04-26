@@ -1,7 +1,9 @@
 package com.spaghetticodegang.trylater.contact;
 
 import com.spaghetticodegang.trylater.contact.enums.ContactStatus;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -69,4 +71,11 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
      * @return a list of {@link Contact} entities
      */
     List<Contact> findByBlockedByIdAndContactStatus(Long blockedById, ContactStatus contactStatus);
+
+    @Transactional
+    @Modifying
+    @Query("""
+            DELETE FROM Contact c WHERE c.receiver.id = :userId OR c.requester.id = :userId
+            """)
+    void deleteByUserId(Long userId);
 }
