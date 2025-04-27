@@ -240,7 +240,5 @@ public class UserService implements UserDetailsService {
 
         recommendationRepository.updateCreatorToNull(me.getId());
         userRepository.delete(me);
-
-        //ALTER TABLE recommendations ALTER COLUMN creator_id DROP NOT NULL
     }
 }
