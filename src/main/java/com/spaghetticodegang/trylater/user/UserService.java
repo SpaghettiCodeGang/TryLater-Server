@@ -2,6 +2,7 @@ package com.spaghetticodegang.trylater.user;
 
 import com.spaghetticodegang.trylater.contact.ContactRepository;
 import com.spaghetticodegang.trylater.image.ImageService;
+import com.spaghetticodegang.trylater.recommendation.RecommendationRepository;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentRepository;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
@@ -31,6 +32,7 @@ public class UserService implements UserDetailsService {
     private final MessageUtil messageUtil;
     private final ContactRepository contactRepository;
     private final RecommendationAssignmentRepository recommendationAssignmentRepository;
+    private final RecommendationRepository recommendationRepository;
 
     /**
      * Loads a user by username or email for authentication.
@@ -145,11 +147,11 @@ public class UserService implements UserDetailsService {
      * Updates the user profile with the new given entries.
      * Authentication required for username, email and new password.
      *
-     * @param me user entity that profile should be updated
+     * @param me              user entity that profile should be updated
      * @param userMeUpdateDto request dto with the new data
      * @return a full response DTO for the currently authenticated user
      * @throws PasswordErrorException if password input for authentication is incorrect
-     * @throws ValidationException if username or email already exists
+     * @throws ValidationException    if username or email already exists
      */
     public UserMeResponseDto updateUserProfile(User me, UserMeUpdateDto userMeUpdateDto) {
         final Map<String, String> errors = new HashMap<>();
@@ -210,7 +212,8 @@ public class UserService implements UserDetailsService {
 
     /**
      * Deletes an user profile and manages the handling for deleting the contacts and assignments for that user.
-     * @param me user that should delete
+     *
+     * @param me              user that should delete
      * @param userMeDeleteDto the dto for the request
      */
     public void deleteUserProfile(User me, UserMeDeleteDto userMeDeleteDto) {
@@ -223,8 +226,9 @@ public class UserService implements UserDetailsService {
 
         contactRepository.deleteContactsByUserId(me.getId());
         recommendationAssignmentRepository.deleteRecommendationAssignmentsByUserId(me.getId());
-        //is user creator ? make as prepToDelete : deleteUser
-        // in delete recommendation 
-        //userRepository.delete(me);
+        recommendationRepository.updateCreator(me.getId());
+        userRepository.delete(me);
+
+        //ALTER TABLE recommendations ALTER COLUMN creator_id DROP NOT NULL
     }
 }
