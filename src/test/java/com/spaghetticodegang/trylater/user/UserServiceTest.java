@@ -1,9 +1,15 @@
 package com.spaghetticodegang.trylater.user;
 
+import com.spaghetticodegang.trylater.contact.ContactRepository;
 import com.spaghetticodegang.trylater.image.ImageService;
+import com.spaghetticodegang.trylater.recommendation.Recommendation;
+import com.spaghetticodegang.trylater.recommendation.RecommendationRepository;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignment;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentRepository;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
+import com.spaghetticodegang.trylater.user.dto.UserMeDeleteDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
 import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
@@ -16,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +46,15 @@ class UserServiceTest {
 
     @Mock
     private ImageService imageService;
+
+    @Mock
+    private ContactRepository contactRepository;
+
+    @Mock
+    private RecommendationAssignmentRepository recommendationAssignmentRepository;
+
+    @Mock
+    private RecommendationRepository recommendationRepository;
 
     @Test
     void shouldLoadUserByUsernameOrEmail() {
@@ -395,4 +411,93 @@ class UserServiceTest {
         verify(imageService, never()).deleteImageByImgPath(anyString());
     }
 
+    @Test
+    void shouldDeleteUserProfileSuccessfully_whenPasswordIsCorrect() {
+        User user = User.builder()
+                .id(1L)
+                .password("encodedPass")
+                .imgPath("/assets/image.jpg")
+                .build();
+
+        UserMeDeleteDto deleteDto = new UserMeDeleteDto();
+        deleteDto.setPassword("correctPassword");
+
+        when(passwordEncoder.matches("correctPassword", "encodedPass")).thenReturn(true);
+
+        RecommendationAssignment assignment = mock(RecommendationAssignment.class);
+        Recommendation recommendation = mock(Recommendation.class);
+
+        when(assignment.getRecommendation()).thenReturn(recommendation);
+        when(recommendation.getId()).thenReturn(10L);
+
+        when(recommendationAssignmentRepository.findAllRecommendationAssignmentByUserId(1L))
+                .thenReturn(List.of(assignment));
+        when(recommendationAssignmentRepository.existsRecommendationAssignmentByRecommendationId(10L))
+                .thenReturn(false);
+
+        userService.deleteUserProfile(user, deleteDto);
+
+        verify(passwordEncoder).matches("correctPassword", "encodedPass");
+        verify(imageService).deleteImageByImgPath("/assets/image.jpg");
+        verify(contactRepository).deleteContactsByUserId(1L);
+        verify(recommendationAssignmentRepository).deleteRecommendationAssignmentsByUserId(1L);
+        verify(recommendationRepository).deleteById(10L);
+        verify(recommendationRepository).updateCreatorToNull(1L);
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void shouldDeleteUserProfileWithoutImgPathAndRecommendationStillExistsSuccessfully() {
+        User user = User.builder()
+                .id(1L)
+                .password("encodedPass")
+                .imgPath(null)
+                .build();
+
+        UserMeDeleteDto deleteDto = new UserMeDeleteDto();
+        deleteDto.setPassword("correctPassword");
+
+        when(passwordEncoder.matches("correctPassword", "encodedPass")).thenReturn(true);
+
+        RecommendationAssignment assignment = mock(RecommendationAssignment.class);
+        Recommendation recommendation = mock(Recommendation.class);
+
+        when(assignment.getRecommendation()).thenReturn(recommendation);
+        when(recommendation.getId()).thenReturn(10L);
+
+        when(recommendationAssignmentRepository.findAllRecommendationAssignmentByUserId(1L))
+                .thenReturn(List.of(assignment));
+        when(recommendationAssignmentRepository.existsRecommendationAssignmentByRecommendationId(10L))
+                .thenReturn(true);
+
+        userService.deleteUserProfile(user, deleteDto);
+
+        verify(passwordEncoder).matches("correctPassword", "encodedPass");
+        verify(imageService, never()).deleteImageByImgPath(null);
+        verify(contactRepository).deleteContactsByUserId(1L);
+        verify(recommendationAssignmentRepository).deleteRecommendationAssignmentsByUserId(1L);
+        verify(recommendationRepository, never()).deleteById(10L);
+        verify(recommendationRepository).updateCreatorToNull(1L);
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void shouldThrowPasswordErrorException_whenPasswordIsIncorrect() {
+        User user = User.builder()
+                .id(1L)
+                .password("encodedPass")
+                .build();
+
+        UserMeDeleteDto deleteDto = new UserMeDeleteDto();
+        deleteDto.setPassword("wrongPassword");
+
+        when(passwordEncoder.matches("wrongPassword", "encodedPass")).thenReturn(false);
+
+        assertThrows(PasswordErrorException.class, () -> {
+            userService.deleteUserProfile(user, deleteDto);
+        });
+
+        verify(passwordEncoder).matches("wrongPassword", "encodedPass");
+        verifyNoMoreInteractions(contactRepository, imageService, userRepository);
+    }
 }
