@@ -3,6 +3,7 @@ package com.spaghetticodegang.trylater.user;
 import com.spaghetticodegang.trylater.contact.ContactRepository;
 import com.spaghetticodegang.trylater.image.ImageService;
 import com.spaghetticodegang.trylater.recommendation.RecommendationRepository;
+import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignment;
 import com.spaghetticodegang.trylater.recommendation.assignment.RecommendationAssignmentRepository;
 import com.spaghetticodegang.trylater.shared.exception.PasswordErrorException;
 import com.spaghetticodegang.trylater.shared.exception.ValidationException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -211,7 +213,8 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Deletes an user profile and manages the handling for deleting the contacts and assignments for that user.
+     * Deletes a user profile and manages the handling for deleting the contacts and assignments for that user.
+     * Additional handles the deleting of not assigned recommendations
      *
      * @param me              user that should delete
      * @param userMeDeleteDto the dto for the request
@@ -225,8 +228,17 @@ public class UserService implements UserDetailsService {
         }
 
         contactRepository.deleteContactsByUserId(me.getId());
+        final List<RecommendationAssignment> allAssignments = recommendationAssignmentRepository.findAllRecommendationAssignmentByUserId(me.getId());
+
         recommendationAssignmentRepository.deleteRecommendationAssignmentsByUserId(me.getId());
-        recommendationRepository.updateCreator(me.getId());
+        allAssignments.forEach(assignment -> {
+            Long recommendationId = assignment.getRecommendation().getId();
+            if (!recommendationAssignmentRepository.existsRecommendationAssignmentByRecommendationId(recommendationId)) {
+                recommendationRepository.deleteById(recommendationId);
+            }
+        });
+
+        recommendationRepository.updateCreatorToNull(me.getId());
         userRepository.delete(me);
 
         //ALTER TABLE recommendations ALTER COLUMN creator_id DROP NOT NULL

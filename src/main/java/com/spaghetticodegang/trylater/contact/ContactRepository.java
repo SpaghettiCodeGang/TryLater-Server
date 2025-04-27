@@ -72,6 +72,11 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
      */
     List<Contact> findByBlockedByIdAndContactStatus(Long blockedById, ContactStatus contactStatus);
 
+    /**
+     * IN case of a user is deleted, all his contacts will be deleted
+     *
+     * @param userId the ID of the user that should be deleted
+     */
     @Transactional
     @Modifying
     @Query("""
