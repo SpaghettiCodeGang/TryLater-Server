@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class TagGroupResponseDto {
 
+    private Long tagGroupId;
     private String tagGroupName;
     private List<TagResponseDto> tags;
 
