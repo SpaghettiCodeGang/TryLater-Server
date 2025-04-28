@@ -234,6 +234,9 @@ public class UserService implements UserDetailsService {
         allAssignments.forEach(assignment -> {
             Long recommendationId = assignment.getRecommendation().getId();
             if (!recommendationAssignmentRepository.existsRecommendationAssignmentByRecommendationId(recommendationId)) {
+                if (assignment.getRecommendation().getImgPath() != null) {
+                    imageService.deleteImageByImgPath(assignment.getRecommendation().getImgPath());
+                }
                 recommendationRepository.deleteById(recommendationId);
             }
         });
