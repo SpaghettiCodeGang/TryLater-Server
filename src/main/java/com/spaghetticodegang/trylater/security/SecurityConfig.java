@@ -2,7 +2,6 @@ package com.spaghetticodegang.trylater.security;
 
 import com.spaghetticodegang.trylater.auth.AuthCookieService;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,18 +16,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.List;
 
 /**
  * Security configuration defining access rules, filters, and JWT-based authentication.
  */
 @Configuration
 public class SecurityConfig {
-
-    @Value("${cors.allowed-origin}")
-    private String allowedOrigin;
 
     /**
      * Creates the custom JWT filter used for authenticating requests via token.
@@ -87,7 +80,6 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.GET, "/").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/api/images").permitAll()
                             .requestMatchers("/h2-console/**").permitAll()
                             .anyRequest().authenticated()
                     )
