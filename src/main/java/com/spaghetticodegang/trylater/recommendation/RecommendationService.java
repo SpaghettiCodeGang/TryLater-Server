@@ -108,14 +108,14 @@ public class RecommendationService {
     /**
      * Updates the status of a {@link RecommendationAssignment} for the currently authenticated user.
      *
-     * @param me                         the currently authenticated {@link User}
-     * @param recommendationAssignmentId the ID of the {@link RecommendationAssignment} to update
-     * @param request                    the {@link RecommendationAssignmentStatusRequestDto} containing the new status
+     * @param me               the currently authenticated {@link User}
+     * @param recommendationId the ID of the {@link Recommendation} to update the assignment status
+     * @param request          the {@link RecommendationAssignmentStatusRequestDto} containing the new status
      * @return a response DTO representing the recommendation
      * @throws RecommendationNotFoundException if there is no recommendation with requested ID
      */
-    public RecommendationResponseDto updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto request) {
-        Long recommendationId = recommendationAssignmentService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, request);
+    public RecommendationResponseDto updateRecommendationAssignmentStatus(User me, Long recommendationId, RecommendationAssignmentStatusRequestDto request) {
+        recommendationAssignmentService.updateRecommendationAssignmentStatus(me, recommendationId, request);
         Recommendation recommendation = getRecommendationById(recommendationId);
 
         return createRecommendationResponseDto(recommendation);
@@ -166,7 +166,8 @@ public class RecommendationService {
 
     /**
      * Lists all assigned recommendation with a specific status for a given user.
-     * @param me the currently authenticated user
+     *
+     * @param me                             the currently authenticated user
      * @param recommendationAssignmentStatus status of the assigment
      * @return a list of response DTOs representing the recommendations
      */

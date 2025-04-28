@@ -42,8 +42,8 @@ public class Recommendation {
     @Column(nullable = false)
     private int rating;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id")
     private User creator;
 
     @Column(nullable = false)

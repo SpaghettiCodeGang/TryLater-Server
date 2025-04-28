@@ -215,24 +215,23 @@ class RecommendationServiceTest {
     @Test
     void testUpdateRecommendationAssignmentStatus_recommendationNotFound() {
         User me = new User();
-        Long recommendationAssignmentId = 1L;
         Long recommendationId = 10L;
         RecommendationAssignmentStatusRequestDto requestDto = new RecommendationAssignmentStatusRequestDto();
 
-        Mockito.when(recommendationAssignmentService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, requestDto))
-                .thenReturn(recommendationId);
+        Mockito.doNothing().when(recommendationAssignmentService)
+                .updateRecommendationAssignmentStatus(me, recommendationId, requestDto);
+
         Mockito.when(recommendationRepository.findById(recommendationId))
                 .thenReturn(Optional.empty());
 
         Assertions.assertThrows(RecommendationNotFoundException.class, () -> {
-            recommendationService.updateRecommendationAssignmentStatus(me, recommendationAssignmentId, requestDto);
+            recommendationService.updateRecommendationAssignmentStatus(me, recommendationId, requestDto);
         });
     }
 
     @Test
     void shouldUpdateRecommendationAssignmentStatusSuccessfully() {
         User user = createUser(1L);
-        Long recommendationAssignmentId = 100L;
         Long recommendationId = 200L;
 
         RecommendationAssignmentStatusRequestDto requestDto = new RecommendationAssignmentStatusRequestDto();
@@ -247,12 +246,11 @@ class RecommendationServiceTest {
                 .category(createCategory(CategoryType.MEDIA))
                 .build();
 
-        when(recommendationAssignmentService.updateRecommendationAssignmentStatus(user, recommendationAssignmentId, requestDto))
-                .thenReturn(recommendationId);
+        doNothing().when(recommendationAssignmentService).updateRecommendationAssignmentStatus(user, recommendationId, requestDto);
         when(recommendationRepository.findById(recommendationId))
                 .thenReturn(Optional.of(recommendation));
 
-        RecommendationResponseDto response = recommendationService.updateRecommendationAssignmentStatus(user, recommendationAssignmentId, requestDto);
+        RecommendationResponseDto response = recommendationService.updateRecommendationAssignmentStatus(user, recommendationId, requestDto);
 
         assertNotNull(response);
         assertEquals(recommendation.getId(), response.getId());
@@ -262,7 +260,7 @@ class RecommendationServiceTest {
         assertEquals(recommendation.getImgPath(), response.getImgPath());
         assertEquals(recommendation.getCategory().getCategoryType(), response.getCategory());
 
-        verify(recommendationAssignmentService).updateRecommendationAssignmentStatus(user, recommendationAssignmentId, requestDto);
+        verify(recommendationAssignmentService).updateRecommendationAssignmentStatus(user, recommendationId, requestDto);
         verify(recommendationRepository).findById(recommendationId);
     }
 

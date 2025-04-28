@@ -1,9 +1,6 @@
 package com.spaghetticodegang.trylater.user;
 
-import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
-import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
-import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
-import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
+import com.spaghetticodegang.trylater.user.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -68,5 +65,11 @@ public class UserController {
     public ResponseEntity<UserMeResponseDto> updateUserProfile(@AuthenticationPrincipal User me, @RequestBody @Valid UserMeUpdateDto userMeUpdateDto) {
         UserMeResponseDto userMeResponseDto = userService.updateUserProfile(me, userMeUpdateDto);
         return ResponseEntity.ok(userMeResponseDto);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal User me, @RequestBody @Valid UserMeDeleteDto userMeDeleteDto) {
+        userService.deleteUserProfile(me, userMeDeleteDto);
+        return ResponseEntity.noContent().build();
     }
 }

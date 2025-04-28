@@ -46,14 +46,13 @@ public class RecommendationAssignmentService {
      * Performs validation and updates the recommendation assignment's status, including setting the acceptance date if applicable.
      *
      * @param me                                       the currently authenticated user
-     * @param recommendationAssignmentId               the ID of the recommendation assignment whose status is to be updated
+     * @param recommendationId                         the ID of the recommendation whose assignment status is to be updated
      * @param recommendationAssignmentStatusRequestDto the DTO containing the new recommendation assignment status
-     * @return a response DTO representing the updated recommendation assignment
      * @throws ValidationException if the status change is invalid
      */
-    public Long updateRecommendationAssignmentStatus(User me, Long recommendationAssignmentId, RecommendationAssignmentStatusRequestDto recommendationAssignmentStatusRequestDto) {
+    public void updateRecommendationAssignmentStatus(User me, Long recommendationId, RecommendationAssignmentStatusRequestDto recommendationAssignmentStatusRequestDto) {
         final RecommendationAssignmentStatus recommendationAssignmentStatus = recommendationAssignmentStatusRequestDto.getRecommendationAssignmentStatus();
-        final RecommendationAssignment recommendationAssignment = getRecommendationAssignmentById(recommendationAssignmentId);
+        final RecommendationAssignment recommendationAssignment = getRecommendationAssignmentByUserIdAndRecommendationId(me.getId(), recommendationId);
 
         if (!Objects.equals(recommendationAssignment.getReceiver().getId(), me.getId())) {
             throw new ValidationException(Map.of("recommendationAssignment", messageUtil.get("recommendation.assignment.error.user.not.allowed")));
@@ -69,8 +68,6 @@ public class RecommendationAssignmentService {
 
         recommendationAssignment.setRecommendationAssignmentStatus(recommendationAssignmentStatus);
         recommendationAssignmentRepository.save(recommendationAssignment);
-
-        return recommendationAssignment.getId();
     }
 
     /**

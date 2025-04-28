@@ -104,15 +104,14 @@ class RecommendationAssignmentServiceTest {
         existingAssignment.setReceiver(differentUser);
         requestDto.setRecommendationAssignmentStatus(RecommendationAssignmentStatus.ACCEPTED);
 
-        when(recommendationAssignmentRepository.findById(recommendationAssignmentId)).thenReturn(Optional.of(existingAssignment));
+        when(recommendationAssignmentRepository.findRecommendationAssignmentByUserIdAndRecommendationId(authenticatedUser.getId(), recommendationId)).thenReturn(existingAssignment);
         when(messageUtil.get("recommendation.assignment.error.user.not.allowed")).thenReturn("User not allowed to update this assignment.");
 
         ValidationException exception = assertThrows(ValidationException.class, () ->
-                recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationAssignmentId, requestDto)
+                recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationId, requestDto)
         );
 
         assertEquals("User not allowed to update this assignment.", exception.getErrors().get("recommendationAssignment"));
-        verify(recommendationAssignmentRepository, times(1)).findById(recommendationAssignmentId);
         verify(recommendationAssignmentRepository, never()).save(any());
     }
 
@@ -120,15 +119,14 @@ class RecommendationAssignmentServiceTest {
     void updateRecommendationAssignmentStatus_cannotRevertToSentStatus() {
         requestDto.setRecommendationAssignmentStatus(RecommendationAssignmentStatus.SENT);
 
-        when(recommendationAssignmentRepository.findById(recommendationAssignmentId)).thenReturn(Optional.of(existingAssignment));
+        when(recommendationAssignmentRepository.findRecommendationAssignmentByUserIdAndRecommendationId(authenticatedUser.getId(), recommendationId)).thenReturn(existingAssignment);
         when(messageUtil.get("recommendation.assignment.error.status.revert.to.sent")).thenReturn("Cannot revert status to SENT.");
 
         ValidationException exception = assertThrows(ValidationException.class, () ->
-                recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationAssignmentId, requestDto)
+                recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationId, requestDto)
         );
 
         assertEquals("Cannot revert status to SENT.", exception.getErrors().get("recommendationAssignmentStatus"));
-        verify(recommendationAssignmentRepository, times(1)).findById(recommendationAssignmentId);
         verify(recommendationAssignmentRepository, never()).save(any());
     }
 
@@ -156,25 +154,28 @@ class RecommendationAssignmentServiceTest {
     @Test
     void updateRecommendationAssignmentStatus_shouldSetAcceptedAtWhenStatusIsAccepted() {
         User authenticatedUser = User.builder().id(1L).build();
-        Long recommendationAssignmentId = 42L;
+        Long recommendationId = 100L;
+
+        Recommendation recommendation = Recommendation.builder().id(recommendationId).build();
 
         RecommendationAssignment existingAssignment = RecommendationAssignment.builder()
-                .id(recommendationAssignmentId)
+                .id(42L)
                 .receiver(authenticatedUser)
                 .recommendationAssignmentStatus(RecommendationAssignmentStatus.SENT)
+                .recommendation(recommendation)
                 .build();
 
         RecommendationAssignmentStatusRequestDto requestDto = new RecommendationAssignmentStatusRequestDto();
         requestDto.setRecommendationAssignmentStatus(RecommendationAssignmentStatus.ACCEPTED);
 
-        when(recommendationAssignmentRepository.findById(recommendationAssignmentId)).thenReturn(Optional.of(existingAssignment));
-        when(recommendationAssignmentRepository.save(any(RecommendationAssignment.class))).thenReturn(existingAssignment);
+        when(recommendationAssignmentService.getRecommendationAssignmentByUserIdAndRecommendationId(authenticatedUser.getId(), recommendationId))
+                .thenReturn(existingAssignment);
+        when(recommendationAssignmentRepository.save(any())).thenReturn(existingAssignment);
 
-        Long updatedId = recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationAssignmentId, requestDto);
+        recommendationAssignmentService.updateRecommendationAssignmentStatus(authenticatedUser, recommendationId, requestDto);
 
-        assertEquals(recommendationAssignmentId, updatedId);
         assertEquals(RecommendationAssignmentStatus.ACCEPTED, existingAssignment.getRecommendationAssignmentStatus());
-        assertNotNull(existingAssignment.getAcceptedAt(), "acceptedAt should be set when status is ACCEPTED");
+        assertNotNull(existingAssignment.getAcceptedAt());
 
         ArgumentCaptor<RecommendationAssignment> argumentCaptor = ArgumentCaptor.forClass(RecommendationAssignment.class);
         verify(recommendationAssignmentRepository).save(argumentCaptor.capture());
@@ -182,9 +183,8 @@ class RecommendationAssignmentServiceTest {
         RecommendationAssignment savedAssignment = argumentCaptor.getValue();
         assertEquals(RecommendationAssignmentStatus.ACCEPTED, savedAssignment.getRecommendationAssignmentStatus());
         assertNotNull(savedAssignment.getAcceptedAt());
-
-        verify(recommendationAssignmentRepository).findById(recommendationAssignmentId);
     }
+
 
     @Test
     void shouldReturnRecommendationsByUserAndStatus() {
