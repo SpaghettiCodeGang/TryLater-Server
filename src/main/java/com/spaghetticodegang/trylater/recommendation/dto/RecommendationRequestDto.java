@@ -17,7 +17,9 @@ public class RecommendationRequestDto {
     @NotBlank(message = "{recommendation.title.notblank}")
     private String title;
 
+    @Size(max = 2000, message = "{recommendation.description.max.value}")
     private String description;
+
     private String imgPath;
 
     @URL(message = "{recommendation.url.invalid}")
