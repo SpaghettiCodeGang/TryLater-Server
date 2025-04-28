@@ -53,6 +53,7 @@ public class TagService {
 
         return tagGroups.stream()
                 .map(tagGroup -> TagGroupResponseDto.builder()
+                        .tagGroupId(tagGroup.getId())
                         .tagGroupName(tagGroup.getTagGroupName())
                         .tags(tagGroup.getTags().stream()
                                 .map(tag -> TagResponseDto.builder()
