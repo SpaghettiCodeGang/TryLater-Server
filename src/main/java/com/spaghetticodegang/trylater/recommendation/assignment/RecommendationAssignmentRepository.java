@@ -1,7 +1,9 @@
 package com.spaghetticodegang.trylater.recommendation.assignment;
 
 import com.spaghetticodegang.trylater.recommendation.Recommendation;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -15,7 +17,7 @@ public interface RecommendationAssignmentRepository extends JpaRepository<Recomm
     /**
      * Finds all assigned recommendations for a given user with a specific status.
      *
-     * @param id the user ID
+     * @param id                             the user ID
      * @param recommendationAssignmentStatus the assignment status
      * @return a list of recommendation entities or an empty list
      */
@@ -24,10 +26,10 @@ public interface RecommendationAssignmentRepository extends JpaRepository<Recomm
             """)
     List<Recommendation> findRecommendationsByUserIdAndRecommendationAssignmentStatus(Long id, RecommendationAssignmentStatus recommendationAssignmentStatus);
 
-    /**       
+    /**
      * Finds the recommendation assignment for the given user ID and recommendation ID.
      *
-     * @param userId the given user ID
+     * @param userId           the given user ID
      * @param recommendationId the given recommendation ID
      * @return A {@link RecommendationAssignment} Entity
      */
@@ -35,6 +37,18 @@ public interface RecommendationAssignmentRepository extends JpaRepository<Recomm
             SELECT r FROM RecommendationAssignment r WHERE r.receiver.id = :userId AND r.recommendation.id = :recommendationId
             """)
     RecommendationAssignment findRecommendationAssignmentByUserIdAndRecommendationId(Long userId, Long recommendationId);
+
+    /**
+     * Finds all recommendation assignments for the given user ID.
+     *
+     * @param userId the given user ID
+     * @return A {@link RecommendationAssignment} Entity
+     */
+    @Query("""
+            SELECT r FROM RecommendationAssignment r WHERE r.receiver.id = :userId
+            """)
+    List<RecommendationAssignment> findAllRecommendationAssignmentByUserId(Long userId);
+
 
     /**
      * Checks if a recommendation assignment for a given recommendation ID exists.
@@ -48,4 +62,17 @@ public interface RecommendationAssignmentRepository extends JpaRepository<Recomm
             WHERE r.recommendation.id = :recommendationId
             """)
     boolean existsRecommendationAssignmentByRecommendationId(Long recommendationId);
+
+
+    /**
+     * Deletes all assignment for the given user.
+     *
+     * @param userId the ID for the user that assignments should be deleting
+     */
+    @Transactional
+    @Modifying
+    @Query("""
+            DELETE FROM RecommendationAssignment r WHERE r.receiver.id = :userId
+            """)
+    void deleteRecommendationAssignmentsByUserId(Long userId);
 }

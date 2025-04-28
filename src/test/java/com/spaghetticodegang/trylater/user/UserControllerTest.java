@@ -2,10 +2,7 @@ package com.spaghetticodegang.trylater.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spaghetticodegang.trylater.shared.util.MessageUtil;
-import com.spaghetticodegang.trylater.user.dto.UserMeRegistrationDto;
-import com.spaghetticodegang.trylater.user.dto.UserMeResponseDto;
-import com.spaghetticodegang.trylater.user.dto.UserMeUpdateDto;
-import com.spaghetticodegang.trylater.user.dto.UserResponseDto;
+import com.spaghetticodegang.trylater.user.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,6 +152,17 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.displayName").value("Updated Tester"))
                 .andExpect(jsonPath("$.email").value("updated@example.com"))
                 .andExpect(jsonPath("$.imgPath").value("/assets/updated.webp"));
+    }
+
+    @Test
+    void shouldReturn204_whenUserIsDeletedSuccessfully() throws Exception {
+        UserMeDeleteDto deleteDto = new UserMeDeleteDto();
+        deleteDto.setPassword("validPassword123");
+
+        mockMvc.perform(delete("/api/user/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(deleteDto)))
+                .andExpect(status().isNoContent());
     }
 
 }
