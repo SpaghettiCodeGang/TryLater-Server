@@ -36,6 +36,7 @@ public class RecommendationAssignmentService {
                 .recommendation(recommendation)
                 .receiver(receiver)
                 .sentAt(LocalDateTime.now())
+                .acceptedAt((Objects.equals(recommendation.getCreator().getId(), receiver.getId()) ? LocalDateTime.now() : null))
                 .recommendationAssignmentStatus(Objects.equals(recommendation.getCreator().getId(), receiver.getId()) ? RecommendationAssignmentStatus.ACCEPTED : RecommendationAssignmentStatus.SENT)
                 .build();
 
