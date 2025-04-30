@@ -3,23 +3,14 @@
 
 package "Benutzerkonto anlegen"{
 "Anmeldeformular\nausfüllen" as (create)
-together {
 "Anmeldung\nabsenden" as (send)
-"Bestätigungslink\nversenden" as (sendmail)
-}
-"Registrierung\nbestätigen" as (accept)
 }
 
 Nutzer ---> (create)
 (create) <. (send) :extend
 Nutzer --> (send)
-(send) <. (sendmail) :extend
-(sendmail) --> Nutzer
-Nutzer ---> (accept)
-
-
 
 database "PostgreSQL DB" as DB
-(accept) --> DB
+(send) --> DB
 
 @enduml
