@@ -8,7 +8,7 @@ enum ContactStatus {
     BLOCKED
 }
 class Contact {
-    - id : UUID
+    - id : Long
     - requester : User
     - receiver : User
     - requestDate : LocalDateTime
@@ -18,7 +18,7 @@ class Contact {
     + getter()
     + setter()
 }
-class ContactRepository {
+interface ContactRepository {
     - contacts : Set<Contact>
     + findAllByRequesterOrReceiverAndContactStatus(user : User) : Set<Contact>
     + findContactById(contactId : Long) : Contact
@@ -39,7 +39,7 @@ class ContactController {
     + GET /api/contact() <<secured>>
     + GET /api/contact/{id}() <<secured>>
     + POST /api/contact() <<secured>>
-    + PUT /api/contact/{id}() <<secured>>
+    + PATCH /api/contact/{id}() <<secured>>
     + DELETE /api/contact/{id}() <<secured>>
 }
 

@@ -3,19 +3,20 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 class User {
-    - id : UUID
+    - id : Long
     - userName : String
     - displayName : String
     - email : String
     - password : String
-    - imgId: Long
+    - imgPath : String
+    - registrationDate : LocalDateTime
     + constructor()
     + getter()
     + setter()
 }
 
-class UserRepository {
-    - user[] : User
+interface UserRepository {
+    - user : Set<User>
     + findByEmailOrUserName(email: String, userName: String) : User
     + existsByEmail(email : String) : boolean
     + existsByUserName(userName : String) : boolean
@@ -36,10 +37,9 @@ class UserController {
     - userService : UserService
     - authService : AuthService
     + GET /api/user/me() <<secured>>
-    + GET /api/user/{id}() <<secured>>
     + GET /api/user/search() <<secured>>
-    + POST /api/user/me()
-    + PUT /api/user/me() <<secured>>
+    + POST /api/user()
+    + PATCH /api/user/me() <<secured>>
     + DELETE /api/user/me() <<secured>>
 }
 
@@ -55,7 +55,7 @@ class JwtAuthFilter {
     # doFilterInternal()
 }
 
-note left of JwtAuthFilter
+note right of JwtAuthFilter
     Der JwtAuthFilter kontrolliert den
     Zugriff auf geschützte Endpunkte.
     Fehlt ein Token oder ist dieser
@@ -75,16 +75,6 @@ class AuthController {
     + POST /api/auth/logout() <<secured>>
 }
 
-UserRepository --> User
-UserService --> UserRepository
-UserController --> AuthService
-UserController --> UserService
-AuthService --> JwtService
-AuthController --> AuthService
-JwtAuthFilter --> UserService
-JwtAuthFilter --> JwtService
-JwtAuthFilter --> AuthService
-
 enum ContactStatus {
     PENDING
     ACCEPTED
@@ -92,18 +82,20 @@ enum ContactStatus {
 }
 
 class Contact {
-    - id : UUID
-    - status : ContactStatus
+    - id : Long
     - requester : User
     - receiver : User
+    - requestDate : LocalDateTime
+    - acceptDate : LocalDateTime
+    - status : ContactStatus
     + constructor()
     + getter()
     + setter()
 }
 
-class ContactRepository {
-    - contact[] : Contact
-    + findAllByRequesterOrReceiverAndContactStatus(user : User) : Contact[]
+interface ContactRepository {
+    - contacts : Set<Contact>
+    + findAllByRequesterOrReceiverAndContactStatus(user : User) : Set<Contact>
     + findContactById(contactId : Long) : Contact
     + save(contact : Contact)
     + update(contact : Contact)
@@ -120,27 +112,22 @@ class ContactService {
 }
 
 class ContactController {
+    - contactService : ContactService
     + GET /api/contact() <<secured>>
-    + GET /api/contact/[id}() <<secured>>
+    + GET /api/contact/{id}() <<secured>>
     + POST /api/contact() <<secured>>
-    + PUT /api/contact/{id}() <<secured>>
-    + DELETE /api/contact/[id}() <<secured>>
+    + PATCH /api/contact/{id}() <<secured>>
+    + DELETE /api/contact/{id}() <<secured>>
 }
 
-Contact "0..*" --* "1" User
-Contact ..> ContactStatus : <<use>>
-ContactRepository --> Contact
-ContactService --> ContactRepository
-ContactController --> ContactService
-
 class Recommendation {
-    - id : UUID
+    - id : Long
     - title : String
     - description : String
+    - url : URL
     - imgPath : String
     - creator : User
     - creationDate : LocalDateTime
-    - url : URI
     - rating : Int
     - category : Category
     - tags : Set<Tag>
@@ -162,23 +149,26 @@ class RecommendationService {
     - categoryRepository : CategoryRepository
     - tagGroupRepository : TagGroupRepository
     - tagRepository : TagRepository
-    + getRecommendationById(recommendationId : Long)
     + getRecommendationsByStatus(user : User, recommendationAssignmentStatus : RecommendationAssignmentStatus)
     + createRecommendation(user : User, requestBody : RequestBody)
     + createRecommendationAssignments(recommendation : Recommendation, receiver : Set<User>)
     + updateRecommendationStatus(user : User, recommendationAssignmentStatus : RecommendationAssignmentStatus)
+    + deleteRecommendation(user : User, (recommendationId : Long)
 }
 class RecommendationController {
     + GET /api/recommendation() <<secured>>
-    + GET /api/recommendation/{id}() <<secured>>
     + POST /api/recommendation() <<secured>>
-    + PUT /api/recommendation/{id}() <<secured>>
+    + PATCH /api/recommendation/{id}() <<secured>>
+    + DELETE /api/recommendation/{id}() <<secured>>
 }
 
 class RecommendationAssignment {
-    - userId : UUID
-    - recommendationId : Long
+    - id : Long
+    - receiver : User
+    - recommendation : Recommendation
     - recommendationAssignmentStatus : RecommendationAssignmentStatus
+    - sentAt : LocalDateTime
+    - acceptedAt : LocalDateTime
     + constructor()
     + getter()
     + setter()
@@ -196,9 +186,9 @@ enum RecommendationAssignmentStatus {
 }
 
 class Category {
-    - id : UUID
+    - id : Long
     - categoryType : CategoryType
-    - tagGroups : List<TagGroup>
+    - tagGroups : Set<TagGroup>
     + constructor()
     + getter()
     + setter()
@@ -218,7 +208,7 @@ enum CategoryType {
 }
 
 class TagGroup {
-    - id : UUID
+    - id : Long
     - tagGroupName : String
     - category : Category
     - tags : Set<Tag>
@@ -236,7 +226,7 @@ interface TagGroupRepository {
 }
 
 class Tag {
-    - id : UUID
+    - id : Long
     - tagName : String
     - tagGroup : TagGroup
     + constructor()
@@ -257,12 +247,62 @@ class TagService {
     + getTagsByCategory(category : Category) : Set<Tag>
 }
 class TagController {
-    + GET /api/tags() <<secured>>
+    + GET /api/recommendation/tags() <<secured>>
 }
+
+class Image {
+    - imgPath : String
+    + constructor()
+    + getter()
+    + setter()
+}
+interface ImageRepository {
+    - image : Set<Image>
+    + save(image : Image)
+    + delete(image : Image)
+}
+class ImageService {
+    - imageRepository : ImageRepository
+    + uploadImage(imageFile : MultipartFile)
+    + deleteImageByImgPath(imgPath : String)
+    - getImageType(String : imageName)
+    - validateImage(imageFile : MultipartFile)
+}
+class ImageController {
+    - imageService : ImageService
+    + POST /api/images() <<secured>>
+    + DELETE /api/images() <<secured>>
+}
+
+Image <-- ImageRepository
+ImageRepository <-- ImageService
+ImageService <-- ImageController
+
+User <-- UserRepository
+UserRepository <-- UserService
+UserService <-- UserController
+UserService <-- JwtAuthFilter
+
+AuthService <-- AuthController
+AuthService <-- UserController
+AuthService <-- JwtAuthFilter
+
+JwtService <-- AuthService
+JwtService <-- JwtAuthFilter
+
+ContactStatus <.. Contact
+Contact <-- ContactRepository
+ContactRepository <-- ContactService
+ContactService <-- ContactController
+
+User "1" *- "0..*" Contact
+User "1" *-- "0..1" Image
 
 Recommendation <-- RecommendationRepository
 RecommendationRepository <-- RecommendationService
 RecommendationService <-- RecommendationController
+
+Recommendation "1" *-- "0..1" Image
 
 RecommendationAssignmentStatus <.. RecommendationAssignment
 RecommendationAssignment <-- RecommendationAssignmentRepository

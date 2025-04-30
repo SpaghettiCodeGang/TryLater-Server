@@ -4,7 +4,7 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 class User {
-    - id : UUID
+    - id : Long
     - userName : String
     - displayName : String
     - email : String
@@ -23,7 +23,7 @@ enum ContactStatus {
 }
 
 class Contact {
-    - id : UUID
+    - id : Long
     - requester : User
     - receiver : User
     - requestDate : LocalDateTime
@@ -37,7 +37,7 @@ class Contact {
 }
 
 class RecommendationAssignment {
-    - id : UUID
+    - id : Long
     - receiver : User
     - recommendation : Recommendation
     - status : StatusEnum
@@ -59,16 +59,16 @@ enum RecommendationStatus {
 }
 
 class Recommendation {
-    - id : UUID
+    - id : Long
     - title : String
     - description : String
     - imgPath : String
     - creator : User
     - creationDate : LocalDateTime
-    - url : URI
+    - url : URL
     - rating : Int
     - category : Category
-    - tags : List<Tag>
+    - tags : Set<Tag>
     + constructor()
     + getter()
     + setter()
@@ -84,19 +84,19 @@ enum CategoryType {
 }
 
 class  Category {
-    - id : UUID
+    - id : Long
     - categoryType : CategoryType
-    - tagGroups : List<TagGroup>
+    - tagGroups : Set<TagGroup>
     + constructor()
     + getter()
     + setter()
 }
 
 class TagGroup {
-    - id : UUID
+    - id : Long
     - tagGroupName : String
     - category : Category
-    - tags : List<Tag>
+    - tags : Set<Tag>
     + constructor()
     + getter()
     + setter()
@@ -105,7 +105,7 @@ class TagGroup {
 }
 
 class Tag {
-    - id : UUID
+    - id : Long
     - tagName : String
     - tagGroup : TagGroup
     + constructor()

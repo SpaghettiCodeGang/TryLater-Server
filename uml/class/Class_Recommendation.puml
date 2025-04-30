@@ -3,7 +3,7 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 class Recommendation {
-    - id : UUID
+    - id : Long
     - title : String
     - description : String
     - url : URL
@@ -31,22 +31,23 @@ class RecommendationService {
     - categoryRepository : CategoryRepository
     - tagGroupRepository : TagGroupRepository
     - tagRepository : TagRepository
-    + getRecommendationById(recommendationId : Long)
     + getRecommendationsByStatus(user : User, recommendationAssignmentStatus : RecommendationAssignmentStatus)
     + createRecommendation(user : User, requestBody : RequestBody)
     + createRecommendationAssignments(recommendation : Recommendation, receiver : Set<User>)
     + updateRecommendationStatus(user : User, recommendationAssignmentStatus : RecommendationAssignmentStatus)
+    + deleteRecommendation(user : User, (recommendationId : Long)
 }
 class RecommendationController {
     + GET /api/recommendation() <<secured>>
-    + GET /api/recommendation/{id}() <<secured>>
     + POST /api/recommendation() <<secured>>
-    + PUT /api/recommendation/{id}() <<secured>>
+    + PATCH /api/recommendation/{id}() <<secured>>
+    + DELETE /api/recommendation/{id}() <<secured>>
 }
 
 class RecommendationAssignment {
-    - userId : UUID
-    - recommendationId : Long
+    - id : Long
+    - receiver : User
+    - recommendation : Recommendation
     - recommendationAssignmentStatus : RecommendationAssignmentStatus
     - sentAt : LocalDateTime
     - acceptedAt : LocalDateTime
@@ -67,9 +68,9 @@ enum RecommendationAssignmentStatus {
 }
 
 class Category {
-    - id : UUID
+    - id : Long
     - categoryType : CategoryType
-    - tagGroups : List<TagGroup>
+    - tagGroups : Set<TagGroup>
     + constructor()
     + getter()
     + setter()
@@ -89,7 +90,7 @@ enum CategoryType {
 }
 
 class TagGroup {
-    - id : UUID
+    - id : Long
     - tagGroupName : String
     - category : Category
     - tags : Set<Tag>
@@ -107,7 +108,7 @@ interface TagGroupRepository {
 }
 
 class Tag {
-    - id : UUID
+    - id : Long
     - tagName : String
     - tagGroup : TagGroup
     + constructor()
@@ -128,7 +129,7 @@ class TagService {
     + getTagsByCategory(category : Category) : Set<Tag>
 }
 class TagController {
-    + GET /api/tags() <<secured>>
+    + GET /api/recommendation/tags() <<secured>>
 }
 
 Recommendation <-- RecommendationRepository

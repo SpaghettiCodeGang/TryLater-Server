@@ -3,7 +3,7 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 class User {
-    - id : UUID
+    - id : Long
     - userName : String
     - displayName : String
     - email : String
@@ -15,8 +15,8 @@ class User {
     + setter()
 }
 
-class UserRepository {
-    - user[] : User
+interface UserRepository {
+    - user : Set<User>
     + findByEmailOrUserName(email: String, userName: String) : User
     + existsByEmail(email : String) : boolean
     + existsByUserName(userName : String) : boolean
@@ -37,10 +37,9 @@ class UserController {
     - userService : UserService
     - authService : AuthService
     + GET /api/user/me() <<secured>>
-    + GET /api/user/{id}() <<secured>>
     + GET /api/user/search() <<secured>>
-    + POST /api/user/me()
-    + PUT /api/user/me() <<secured>>
+    + POST /api/user()
+    + PATCH /api/user/me() <<secured>>
     + DELETE /api/user/me() <<secured>>
 }
 
@@ -76,14 +75,16 @@ class AuthController {
     + POST /api/auth/logout() <<secured>>
 }
 
-UserRepository --> User
-UserService --> UserRepository
-UserController --> AuthService
-UserController --> UserService
-AuthService --> JwtService
-AuthController --> AuthService
-JwtAuthFilter --> UserService
-JwtAuthFilter --> JwtService
-JwtAuthFilter --> AuthService
+User <-- UserRepository
+UserRepository <-- UserService
+UserService <-- UserController
+UserService <-- JwtAuthFilter
+
+AuthService <-- AuthController
+AuthService <-- UserController
+AuthService <-- JwtAuthFilter
+
+JwtService <-- AuthService
+JwtService <-- JwtAuthFilter
 
 @enduml
