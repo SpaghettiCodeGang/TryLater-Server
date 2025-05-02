@@ -5,11 +5,12 @@
       {
         "tagGroupName": "Ernährungspräferenz",
         "tags": [
-          "vegan",
-          "vegetarisch",
+          "Vegan",
+          "Vegetarisch",
           "Omnivor",
           "Laktosefrei",
-          "Glutenfrei"
+          "Glutenfrei",
+          "wenig Zucker"
         ]
       },
       {
@@ -43,7 +44,41 @@
         "tagGroupName": "Genre",
         "tags": [
           "Action",
-          "Komödie"
+          "Komödie",
+          "Drama",
+          "Sitcom",
+          "Horror",
+          "Thriller",
+          "News",
+          "Interessantes",
+          "Romantik",
+          "Rap",
+          "Klassik",
+          "Pop",
+          "Rock",
+          "Metal",
+          "EDM"
+        ]
+      },
+      {
+        "tagGroupName": "Mediumskategorie",
+        "tags": [
+          "Film",
+          "Spiel",
+          "Musik",
+          "Serie",
+          "Fernsehsendung",
+          "Buch",
+          "Magazin",
+          "Zeitung"
+        ]
+      },
+      {
+        "tagGroupName": "Länge",
+        "tags": [
+          "Geringer Zeitaufwand",
+          "Mittlerer Zeitaufwand",
+          "Hoher Zeitaufwand"
         ]
       }
     ]
@@ -55,8 +90,30 @@
         "tagGroupName": "Location Type",
         "tags": [
           "Restaurant",
-          "Museum",
+          "Sehenswürdigkeit",
+          "Freizeitaktivität",
+          "Feier",
+          "Dateidee",
+          "Laden",
+          "Imbiss",
           "Café"
+        ]
+      },
+      {
+        "tagGroupName": "weitere Tags",
+        "tags": [
+          "Teuer",
+          "Preiswert",
+          "Gratis",
+          "Familienfreundlich",
+          "Barrierefrei",
+          "Kinderfreundlich",
+          "Gut besucht",
+          "Wenig besucht",
+          "Lange Wartezeiten",
+          "Kurze Wartezeiten",
+          "Keine Wartezeiten",
+          "Authentisch"
         ]
       }
     ]
@@ -68,7 +125,42 @@
         "tagGroupName": "Material",
         "tags": [
           "Plastikfrei",
+          "Plastik",
+          "Metall",
+          "Stoff",
+          "Papier",
+          "Elastisch",
+          "Rbust",
           "Recycelt"
+        ]
+      },
+      {
+        "tagGroupName": "Nutzungsrahmen",
+        "tags": [
+          "Haushalt",
+          "Garten",
+          "Freizeit",
+          "Entspannung",
+          "Küche",
+          "Schlafzimmer",
+          "Kinderzimmer",
+          "Kleidung",
+          "Elektronik",
+          "Bücher",
+          "Baby",
+          "Geschenkidee",
+          "Auto",
+          "Sport"
+        ]
+      },
+      {
+        "tagGroupName": "weitere Tags",
+        "tags": [
+          "Nachhaltig",
+          "Umweltbewusst",
+          "Umweltschonend",
+          "Bio",
+          "Handmade"
         ]
       }
     ]
