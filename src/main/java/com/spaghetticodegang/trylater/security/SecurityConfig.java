@@ -77,7 +77,18 @@ public class SecurityConfig {
 
                     // Authorization rules
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(HttpMethod.GET, "/", "/index.html", "/static/**", "/assets/**", "/favicon.ico").permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    "/",
+                                    "/index.html",
+                                    "/static/**",
+                                    "/assets/**",
+                                    "/android-chrome-192x192.png",
+                                    "/android-chrome-512x512.png",
+                                    "/apple-touch-icon.png",
+                                    "/favicon.ico",
+                                    "/favicon-16x16.png",
+                                    "/favicon-32x32.png")
+                            .permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/user").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                             .requestMatchers("/h2-console/**").permitAll()
